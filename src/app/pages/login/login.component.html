@@ -1,0 +1,98 @@
+<!-- src/app/pages/login/login.component.html -->
+
+<!-- Optional Background behind the card -->
+<div class="login-bg"></div>
+
+<div class="d-flex justify-content-center align-items-center min-vh-100">
+  
+  <div class="login-wrapper">
+    <div class="row g-0 h-100">
+      
+      <!-- LEFT PANEL: Purple Gradient & 3D Image -->
+      <div class="col-md-6 d-none d-md-flex left-panel">
+        <div class="content-box">
+          <h2>Welcome Back!</h2>
+          <p>Start your productive journey with ZeroxHub.</p>
+          <!-- Make sure this image exists in src/assets/img/ -->
+          <img src="assets/img/loginlogo.png" alt="Rocket" class="img-fluid floating-rocket">
+        </div>
+      </div>
+
+      <!-- RIGHT PANEL: Login Form -->
+      <div class="col-md-6 right-panel">
+        <div class="form-box">
+          
+          <div class="text-center mb-2">
+            <h3>Sign In</h3>
+            <p class="text-muted small">Please enter your details to continue.</p>
+          </div>
+
+          <form #loginForm="ngForm" (ngSubmit)="onSubmit()">
+            
+            <!-- Error Alert -->
+            <div *ngIf="errorMessage" class="alert alert-danger p-2 small mb-3">
+              {{ errorMessage }}
+            </div>
+
+            <!-- Email Input -->
+            <div class="mb-3">
+              <input type="text" class="form-control custom-input" 
+                     placeholder="Email or Phone Number"
+                     name="identifier" 
+                     [(ngModel)]="model.identifier" 
+                     required>
+            </div>
+
+            <!-- Password Input -->
+            <div class="mb-3">
+              <input type="password" class="form-control custom-input" 
+                     placeholder="Password"
+                     name="password" 
+                     [(ngModel)]="model.password" 
+                     required>
+            </div>
+
+            <!-- Extras: Checkbox & Forgot Password -->
+            <div class="d-flex justify-content-between align-items-center mb-4 small px-1">
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="keepLogin">
+                <label class="form-check-label text-muted" for="keepLogin">Keep me logged in</label>
+              </div>
+              <a href="#" class="text-primary text-decoration-none fw-bold">Forgot Password?</a>
+            </div>
+
+            <!-- Sign In Button -->
+            <button type="submit" class="custom-btn w-100 mb-4">
+              SIGN IN
+            </button>
+
+            <!-- Social Login Section -->
+            <div class="text-center text-muted small mb-3">or continue with</div>
+
+            <div class="d-flex justify-content-center gap-3 mb-4">
+              <!-- Added (click) events here -->
+              <button type="button" class="social-btn" (click)="loginWithGoogle()">
+                <img src="https://img.icons8.com/color/48/google-logo.png" width="22" alt="Google">
+              </button>
+              <button type="button" class="social-btn" (click)="loginWithApple()">
+                <img src="https://img.icons8.com/ios-filled/50/mac-os.png" width="22" alt="Apple">
+              </button>
+              <button type="button" class="social-btn" (click)="loginWithFacebook()">
+                <img src="https://img.icons8.com/color/48/facebook-new.png" width="22" alt="Facebook">
+              </button>
+            </div>
+
+            <!-- Register Link -->
+            <div class="text-center small">
+              Don't have an account? 
+              <a routerLink="/register" class="fw-bold text-primary text-decoration-none">Register</a>
+            </div>
+
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

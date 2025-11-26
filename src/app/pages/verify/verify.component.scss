@@ -1,0 +1,128 @@
+/* ------------------------------ */
+/*       MAIN PAGE WRAPPER        */
+/* ------------------------------ */
+
+.container {
+  display: flex;
+  justify-content: center;
+  padding: 50px 20px;
+}
+
+/* ------------------------------ */
+/*           CARD STYLE           */
+/* ------------------------------ */
+
+.card {
+  border: none;
+  border-radius: 22px;
+  padding: 40px;
+  background: #ffffff;
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.12);
+}
+
+h3 {
+  font-weight: 600;
+  font-size: 28px;
+  color: #222;
+  margin-bottom: 18px !important;
+}
+
+p {
+  color: #555;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+p strong {
+  color: #7b2ff7;
+}
+
+/* ------------------------------ */
+/*            INPUT BOXES         */
+/* ------------------------------ */
+
+.form-group label {
+  font-size: 14px;
+  color: #444;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.form-control {
+  padding: 14px 16px;
+  font-size: 15px;
+  border-radius: 12px;
+  background: #f3f3f7;
+  border: 1px solid #e5e5e5;
+  transition: 0.2s;
+}
+
+.form-control:focus {
+  outline: none;
+  background: #fff;
+  border-color: #7b2ff7;
+  box-shadow: 0 0 0 3px rgba(123, 47, 247, 0.15);
+}
+
+/* ------------------------------ */
+/*             BUTTON             */
+/* ------------------------------ */
+
+.btn-primary {
+  background: linear-gradient(90deg, #6a11cb, #8a2be2, #7b2ff7);
+  border: none;
+  padding: 14px 20px;
+  font-size: 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+}
+
+/* ------------------------------ */
+/*        RESEND LINK STYLE       */
+/* ------------------------------ */
+
+p a {
+  color: #005eff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+p a:hover {
+  text-decoration: underline;
+}
+
+/* ------------------------------ */
+/*         ERROR MESSAGE          */
+/* ------------------------------ */
+
+.alert-danger {
+  border-radius: 10px;
+  font-size: 14px;
+  padding: 10px 14px;
+}
+.verify-container {
+  width: 100%;
+  max-width: 500px;
+  margin: auto;
+  padding: 20px;
+}
+
+
+/* ------------------------------ */
+/*         RESPONSIVENESS         */
+/* ------------------------------ */
+
+@media (max-width: 520px) {
+  .card {
+    padding: 28px 22px;
+  }
+
+  h3 {
+    font-size: 24px;
+  }
+}

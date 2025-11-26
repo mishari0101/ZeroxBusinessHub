@@ -1,1 +1,68 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* src/styles.scss */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #eef2f6; /* Very soft gray-blue */
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+}
+
+/* Smooth Fade In Animation */
+.fade-in-up {
+    animation: fadeInUp 0.8s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+@media (max-width: 768px) {
+  .left-panel {
+    display: none !important;
+  }
+
+  .login-wrapper,
+  .register-wrapper,
+  .verify-card {
+    margin: 10px;
+    border-radius: 18px !important;
+  }
+
+  .form-box {
+    width: 95% !important;
+    padding: 25px 10px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-box {
+    width: 100% !important;
+  }
+
+  input,
+  button {
+    font-size: 0.9rem !important;
+  }
+}

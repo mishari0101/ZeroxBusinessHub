@@ -1,0 +1,33 @@
+<!-- src/app/pages/verify/verify.component.html -->
+
+<div class="verify-container">
+  <div class="card shadow p-4">
+    <h3 class="text-center mb-4">Verify Your Account</h3>
+    <p class="text-center">
+      A 6-digit verification code has been sent to <strong>{{ identifier }}</strong>.
+      Please enter it below to activate your account.
+    </p>
+
+    <form #verifyForm="ngForm" (ngSubmit)="onSubmit()">
+      
+      <div *ngIf="errorMessage" class="alert alert-danger">
+        {{ errorMessage }}
+      </div>
+      
+      <!-- This is a hidden field to send the identifier back to the API -->
+      <input type="hidden" name="identifier" [(ngModel)]="model.identifier">
+
+      <div class="form-group mb-3">
+        <label for="code">Verification Code</label>
+        <input type="text" id="code" name="code" class="form-control" 
+               placeholder="Enter 6-digit code" [(ngModel)]="model.code" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100" [disabled]="!verifyForm.form.valid">Verify</button>
+    </form>
+    
+    <p class="text-center mt-3">
+        Didn't receive a code? <a href="#">Resend</a>
+    </p>
+  </div>
+</div>
