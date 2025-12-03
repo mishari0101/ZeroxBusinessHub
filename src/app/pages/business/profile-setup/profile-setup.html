@@ -1,0 +1,93 @@
+<div class="page-bg"></div>
+
+<div class="container d-flex justify-content-center align-items-center min-vh-100 py-5">
+  <div class="setup-wrapper">
+    
+    <!-- Header Section -->
+    <div class="header-section text-center">
+      <h2>Business Setup</h2>
+      <p>Tell us about your business to get started.</p>
+    </div>
+
+    <!-- Form Section -->
+    <div class="form-section">
+      <form #setupForm="ngForm" (ngSubmit)="onSubmit()">
+
+        <div *ngIf="errorMessage" class="alert alert-danger small">{{ errorMessage }}</div>
+
+        <!-- 1. IMAGE UPLOAD SECTION (NEW) -->
+        <div class="mb-4 text-center">
+          <label class="form-label d-block text-start small fw-bold text-muted">Business Logo / Image</label>
+          
+          <div class="image-upload-wrapper d-flex gap-3">
+            
+            <!-- Clickable Box -->
+            <div class="upload-box" (click)="fileInput.click()" *ngIf="!selectedImagePreview">
+              <span class="plus-icon">+</span>
+              <span class="upload-text">Upload</span>
+            </div>
+
+            <!-- Preview Box -->
+            <div class="preview-box" *ngIf="selectedImagePreview" (click)="fileInput.click()">
+              <img [src]="selectedImagePreview" alt="Preview">
+            </div>
+
+            <input type="file" #fileInput (change)="onFileSelected($event)" hidden accept="image/*">
+          </div>
+        </div>
+
+        <!-- 2. Row 1: Business Name & Category -->
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Business Name</label>
+            <input type="text" class="form-control custom-input" name="businessName" 
+                   [(ngModel)]="model.businessName" placeholder="e.g. Zerox Salon" required>
+          </div>
+          <div class="col-md-6 mt-3 mt-md-0">
+            <label class="form-label">Category</label>
+            <select class="form-select custom-input" name="category" [(ngModel)]="model.category" required>
+              <option value="" disabled selected>Select Category</option>
+              <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 3. Row 2: Description -->
+        <div class="mb-3">
+          <label class="form-label">Description</label>
+          <textarea class="form-control custom-input" rows="3" name="description" 
+                    [(ngModel)]="model.description" placeholder="Short description of your services..."></textarea>
+        </div>
+
+        <!-- 4. Row 3: Address & Phone -->
+        <div class="row mb-3">
+          <div class="col-md-7">
+            <label class="form-label">Address</label>
+            <input type="text" class="form-control custom-input" name="address" 
+                   [(ngModel)]="model.address" placeholder="Street, City, Zip" required>
+          </div>
+          <div class="col-md-5 mt-3 mt-md-0">
+            <label class="form-label">Phone Number</label>
+            <input type="text" class="form-control custom-input" name="phone" 
+                   [(ngModel)]="model.phone" placeholder="+94 98765..." required>
+          </div>
+        </div>
+
+        <!-- 5. Row 4: Working Hours -->
+        <div class="mb-4">
+          <label class="form-label">Working Hours</label>
+          <input type="text" class="form-control custom-input" name="workingHours" 
+                 [(ngModel)]="model.workingHours" placeholder="e.g. Mon-Sat: 9AM - 8PM">
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="custom-btn w-100" [disabled]="!setupForm.form.valid || isLoading">
+          <span *ngIf="!isLoading">CREATE PROFILE</span>
+          <span *ngIf="isLoading">Processing...</span>
+        </button>
+
+      </form>
+    </div>
+
+  </div>
+</div>

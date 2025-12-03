@@ -1,0 +1,115 @@
+<div class="page-bg">
+  <div class="container-fluid px-4 py-4"> <!-- Uses Full Screen Width -->
+    
+    <!-- 1. HEADER SECTION -->
+    <div class="d-flex justify-content-between align-items-center mb-4 header-area">
+      <div>
+        <h2 class="fw-bold text-dark mb-1">My Services</h2>
+        <p class="text-muted m-0">Manage and update your service catalog.</p>
+      </div>
+      <button class="custom-btn" (click)="openModal()">
+        <i class="bi bi-plus-lg"></i> Add New Service
+      </button>
+    </div>
+  
+    <!-- 2. LOADING STATE -->
+    <div *ngIf="isLoading" class="text-center py-5 text-muted">
+      <div class="spinner-border text-primary" role="status"></div>
+      <p class="mt-2">Loading services...</p>
+    </div>
+  
+    <!-- 3. EMPTY STATE -->
+    <div *ngIf="!isLoading && services.length === 0" class="text-center py-5 empty-state">
+      <img src="assets/img/loginlogo.png" alt="Empty" width="120" class="mb-3 opacity-50">
+      <h5>No Services Added Yet</h5>
+      <p class="text-muted">Click the "Add New Service" button to get started.</p>
+    </div>
+  
+    <!-- 4. SERVICES GRID (RESPONSIVE) -->
+    <!-- col-12 (Mobile), col-sm-6 (Tablet), col-lg-4 (Laptop), col-xl-3 (Wide Screen) -->
+    <div class="row g-4" *ngIf="!isLoading && services.length > 0">
+      <div class="col-12 col-sm-6 col-lg-4 col-xl-3" *ngFor="let service of services">
+        
+        <div class="service-card h-100">
+          <!-- Image -->
+          <div class="card-img-wrapper">
+            <div class="card-img" [style.backgroundImage]="'url(' + (service.imageUrl || 'assets/img/placeholder.jpg') + ')'"></div>
+            <span class="price-tag">${{ service.price }}</span>
+          </div>
+          
+          <div class="card-body d-flex flex-column p-3">
+            <h5 class="fw-bold text-dark mb-2 text-truncate" title="{{ service.serviceName }}">
+              {{ service.serviceName }}
+            </h5>
+            
+            <p class="text-muted small mb-3 flex-grow-1 service-desc">
+              {{ service.description || 'No description provided.' }}
+            </p>
+  
+            <div class="d-flex align-items-center text-secondary small mb-3">
+              <span class="me-3"><i class="bi bi-clock-history"></i> {{ service.durationMinutes }} Mins</span>
+            </div>
+  
+            <!-- Action Buttons -->
+            <div class="d-flex gap-2 mt-auto">
+              <button class="btn btn-light text-primary flex-fill fw-bold border" (click)="openModal(service)">
+                Edit
+              </button>
+              <button class="btn btn-light text-danger flex-fill fw-bold border" (click)="deleteService(service.id)">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+  
+      </div>
+    </div>
+  
+  </div> 
+</div>
+
+<!-- MODAL REMAINS SAME (Just verify it exists below) -->
+<div class="modal-overlay" *ngIf="showModal">
+  <div class="modal-content">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="fw-bold">{{ isEditMode ? 'Edit Service' : 'Add New Service' }}</h4>
+      <button class="btn-close" (click)="closeModal()"></button>
+    </div>
+
+    <!-- Image Upload -->
+    <label class="form-label small fw-bold text-muted">Service Image</label>
+    <div class="image-upload-container mb-3">
+      <div class="upload-box" (click)="fileInput.click()" *ngIf="!selectedImagePreview">
+        <span>+</span>
+      </div>
+      <div class="preview-box" *ngIf="selectedImagePreview" (click)="fileInput.click()">
+        <img [src]="selectedImagePreview" alt="Preview">
+      </div>
+      <input type="file" #fileInput (change)="onFileSelected($event)" hidden accept="image/*">
+    </div>
+
+    <!-- Form -->
+    <div class="mb-3">
+      <label class="form-label small fw-bold text-muted">Service Name</label>
+      <input type="text" class="form-control" placeholder="e.g. Haircut" [(ngModel)]="newService.serviceName">
+    </div>
+    <div class="mb-3">
+      <label class="form-label small fw-bold text-muted">Description</label>
+      <textarea class="form-control" rows="2" [(ngModel)]="newService.description"></textarea>
+    </div>
+    <div class="row mb-4">
+      <div class="col-6">
+        <label class="form-label small fw-bold text-muted">Price ($)</label>
+        <input type="number" class="form-control" [(ngModel)]="newService.price">
+      </div>
+      <div class="col-6">
+        <label class="form-label small fw-bold text-muted">Duration (Mins)</label>
+        <input type="number" class="form-control" [(ngModel)]="newService.durationMinutes">
+      </div>
+    </div>
+
+    <button class="custom-btn w-100" (click)="saveService()" [disabled]="isLoading">
+      {{ isLoading ? 'Saving...' : 'Save Service' }}
+    </button>
+  </div>
+</div>

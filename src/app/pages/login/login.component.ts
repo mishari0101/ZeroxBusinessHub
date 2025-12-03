@@ -1,10 +1,10 @@
-// src/app/pages/login/login.component.ts
-
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router'; // Import RouterLink for HTML links
+import { Router, RouterLink } from '@angular/router'; 
 import { AuthService } from '../../services/auth.service';
+// 1. IMPORT BUSINESS SERVICE
+import { BusinessService } from '../../services/business.service'; 
 
 @Component({
   selector: 'app-login',
@@ -12,64 +12,80 @@ import { AuthService } from '../../services/auth.service';
   imports: [
     CommonModule, 
     FormsModule,
-    RouterLink // Required for [routerLink] to work in HTML
+    RouterLink 
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
   
-  // Model to store form data
   model: any = {};
   errorMessage: string = '';
 
-  constructor(private authService: AuthService, private router: Router) { }
+  // 2. INJECT BUSINESS SERVICE IN CONSTRUCTOR
+  constructor(
+    private authService: AuthService, 
+    private businessService: BusinessService, 
+    private router: Router
+  ) { }
 
   // 1. Standard Email/Password Login
   onSubmit(): void {
     this.errorMessage = '';
-    console.log('Attempting login with:', this.model);
-
+    
     this.authService.login(this.model).subscribe({
       next: (response) => {
         console.log('Login successful!', response);
         
-        // TODO: Save the Token here (e.g., localStorage.setItem('token', response.token))
+        // 1. SAVE THE TOKEN (Crucial Step)
+        this.authService.saveToken(response.token);
         
-        // Redirect based on role (Placeholder logic)
+        // 2. REDIRECT BASED ON ROLE
         if (response.role === 'Admin') {
-          // this.router.navigate(['/admin']);
-        } else if (response.role === 'BusinessOwner') {
-          // this.router.navigate(['/business']);
-        } else {
-          // Default redirect for Customers
+           this.router.navigate(['/admin/approvals']);
+        } 
+        else if (response.role === 'BusinessOwner') {
+           // Instead of going directly to setup, check if profile exists
+           this.checkBusinessProfileAndRedirect();
+        } 
+        else {
+           // Default: Customer Home
            this.router.navigate(['/']); 
         }
-        
-        // For now, just show an alert so you know it worked
-        alert('Login Successful! Welcome back.');
       },
       error: (err) => {
         console.error('Login failed', err);
-        // Display error from backend or generic message
         this.errorMessage = err.error?.Message || 'Login failed. Please check your credentials.';
       }
     });
   }
 
-  // 2. Social Login Handlers (Placeholders for now)
+  // 3. NEW HELPER METHOD TO CHECK PROFILE
+  checkBusinessProfileAndRedirect() {
+    this.businessService.getMyProfile().subscribe({
+      next: (data) => {
+        // SUCCESS: Profile Irukku -> Go to Manage Services (Dashboard)
+        console.log('Business Profile found:', data);
+        this.router.navigate(['/business/manage-services']);
+      },
+      error: (err) => {
+        // ERROR (404): Profile Illa -> Go to Setup Page
+        console.log('No Business Profile found, redirecting to setup.');
+        this.router.navigate(['/business/profile-setup']);
+      }
+    });
+  }
+
+  // 2. Social Login Handlers
   loginWithGoogle() {
-    console.log('Google Login Clicked');
     alert('Google Login integration is coming soon!');
   }
 
   loginWithApple() {
-    console.log('Apple Login Clicked');
     alert('Apple Login integration is coming soon!');
   }
 
   loginWithFacebook() {
-    console.log('Facebook Login Clicked');
     alert('Facebook Login integration is coming soon!');
   }
 }

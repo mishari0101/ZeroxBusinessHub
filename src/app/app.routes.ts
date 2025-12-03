@@ -1,16 +1,70 @@
-// src/app/app.routes.ts
-
 import { Routes } from '@angular/router';
-
-// THE FIX IS HERE: The path should start with './' not '../'
-import { RegisterComponent } from './pages/register/register.component';
 import { LoginComponent } from './pages/login/login.component';
+import { RegisterComponent } from './pages/register/register.component';
 import { VerifyComponent } from './pages/verify/verify.component';
 
+// --- LAYOUTS ---
+import { BusinessLayoutComponent } from './layouts/business-layout/business-layout'; 
+import { CustomerLayoutComponent } from './layouts/customer-layout/customer-layout';
+
+// --- PAGES ---
+import { ProfileSetupComponent } from './pages/business/profile-setup/profile-setup';
+import { ManageServicesComponent } from './pages/business/manage-services/manage-services';
+import { DashboardComponent } from './pages/business/dashboard/dashboard'; 
+import { HomeComponent } from './pages/customer/home/home';
+
+import { ServiceDetails } from './pages/customer/service-details/service-details';
+
 export const routes: Routes = [
-    { path: 'register', component: RegisterComponent },
-    { path: 'login', component: LoginComponent },
-    { path: 'verify', component: VerifyComponent },
-    { path: '', redirectTo: '/login', pathMatch: 'full' },
-    { path: '**', redirectTo: '/login' } 
+  
+  // ==========================================
+  // 1. CUSTOMER ROUTES (Root Path)
+  // This must be FIRST so localhost:4200 loads Home
+  // ==========================================
+  { 
+    path: '', 
+    component: CustomerLayoutComponent,
+    children: [
+      { path: '', component: HomeComponent },
+      { path: 'service-details/:id', component: ServiceDetails }
+    ]
+  },
+
+  // ==========================================
+  // 2. AUTH ROUTES
+  // ==========================================
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
+  { path: 'verify', component: VerifyComponent },
+
+  // ==========================================
+  // 3. BUSINESS OWNER ROUTES
+  // ==========================================
+  { 
+    path: 'business', 
+    component: BusinessLayoutComponent,
+    children: [
+      // Dashboard (Main Page for Business)
+      { path: 'dashboard', component: DashboardComponent }, 
+
+      // Setup Profile (First time only)
+      { path: 'profile-setup', component: ProfileSetupComponent },
+
+      // Manage Services
+      { path: 'manage-services', component: ManageServicesComponent }
+    ]
+  },
+
+  // ==========================================
+  // 4. ADMIN ROUTES (Commented out for now)
+  // ==========================================
+  /*
+  {
+    path: 'admin',
+    component: AdminLayoutComponent,
+    children: [
+      // { path: 'dashboard', component: AdminDashboardComponent }
+    ]
+  }
+  */
 ];

@@ -1,0 +1,87 @@
+<div class="dashboard-container">
+  
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="text-center mt-5">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p>Loading Dashboard...</p>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!isLoading && profile" class="content fade-in">
+    
+    <!-- 1. Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="fw-bold text-dark mb-1">{{ profile.businessName }}</h2>
+        <p class="text-muted mb-0">
+          <span class="badge bg-purple me-2">{{ profile.category }}</span>
+          📍 {{ profile.address }}
+        </p>
+      </div>
+      <!-- Add Service Button (Links to your Manage Services Page) -->
+      <button routerLink="/business/manage-services" class="btn custom-btn">
+        + Add New Service
+      </button>
+    </div>
+
+    <!-- 2. Quick Stats Row -->
+    <div class="row mb-4">
+      <div class="col-md-4">
+        <div class="stat-card">
+          <h3>{{ profile.services?.length || 0 }}</h3>
+          <p>Total Services</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-card">
+          <h3>0</h3>
+          <p>Today's Bookings</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-card">
+          <h3>$0</h3>
+          <p>Revenue</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Services List Section -->
+    <div class="card shadow-sm border-0">
+      <div class="card-header bg-white py-3">
+        <h5 class="mb-0 fw-bold">My Services</h5>
+      </div>
+      <div class="card-body p-0">
+        
+        <table class="table table-hover mb-0">
+          <thead class="bg-light">
+            <tr>
+              <th class="ps-4">Service Name</th>
+              <th>Price</th>
+              <th>Duration</th>
+              <th class="text-end pe-4">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let service of profile.services">
+              <td class="ps-4 fw-bold">{{ service.serviceName }}</td>
+              <td class="text-success fw-bold">${{ service.price }}</td>
+              <td>{{ service.durationMinutes }} mins</td>
+              <td class="text-end pe-4">
+                <button class="btn btn-sm btn-outline-danger">Delete</button>
+              </td>
+            </tr>
+            
+            <tr *ngIf="profile.services?.length === 0">
+              <td colspan="4" class="text-center py-4 text-muted">
+                No services added yet. Click "Add New Service" to start.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+
+  </div>
+</div>
