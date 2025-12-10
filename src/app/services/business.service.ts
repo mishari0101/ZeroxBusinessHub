@@ -8,80 +8,88 @@ import { AuthService } from './auth.service';
 })
 export class BusinessService {
 
-  // Check your port
+  // Using your specific port
   private baseUrl = 'https://localhost:7021/api/business'; 
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 
-  private getHeaders() {
+  // 1. JSON Headers (For GET requests & Text-Only POST)
+  private getJsonHeaders() {
     const token = this.authService.getToken(); 
     return {
       headers: new HttpHeaders({
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json' 
       })
     };
   }
 
-  // Update registerBusiness method:
-
-registerBusiness(data: any, file: File | null): Observable<any> {
-  const formData = new FormData();
-  
-  formData.append('BusinessName', data.businessName);
-  formData.append('Category', data.category);
-  formData.append('Description', data.description || '');
-  formData.append('Address', data.address);
-  formData.append('Phone', data.phone);
-  formData.append('WorkingHours', data.workingHours || '');
-
-  // Append Image if selected
-  if (file) {
-    formData.append('image', file);
+  // 2. FORM DATA Headers (For File Uploads)
+  private getFormDataHeaders() {
+    const token = this.authService.getToken(); 
+    return {
+      headers: new HttpHeaders({
+        'Authorization': `Bearer ${token}`
+        // Browser sets Content-Type automatically for FormData
+      })
+    };
   }
 
-  const token = this.authService.getToken();
-  const headers = { 'Authorization': `Bearer ${token}` };
-
-  return this.http.post(`${this.baseUrl}/register`, formData, { headers });
-}
+  // ==========================================
+  // 1. PROFILE & REGISTRATION
+  // ==========================================
+  
+  registerBusiness(data: FormData): Observable<any> {
+    return this.http.post(`${this.baseUrl}/register`, data, this.getFormDataHeaders());
+  }
 
   getMyProfile(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/my-profile`, this.getHeaders());
+    return this.http.get(`${this.baseUrl}/my-profile`, this.getJsonHeaders());
   }
 
-  addService(data: any, file: File | null): Observable<any> {
-    const formData = new FormData();
-    formData.append('ServiceName', data.serviceName);
-    formData.append('Description', data.description || '');
-    formData.append('Price', data.price.toString());
-    formData.append('DurationMinutes', data.durationMinutes.toString());
-
-    if (file) { formData.append('image', file); }
-
-    const token = this.authService.getToken();
-    const headers = { 'Authorization': `Bearer ${token}` };
-
-    return this.http.post(`${this.baseUrl}/add-service`, formData, { headers });
+  updateProfile(data: FormData): Observable<any> {
+    return this.http.put(`${this.baseUrl}/update-profile`, data, this.getFormDataHeaders());
   }
 
-  // 🔥 UPDATED: Update Service
-  updateService(id: number, data: any, file: File | null): Observable<any> {
-    const formData = new FormData();
-    formData.append('ServiceName', data.serviceName);
-    formData.append('Description', data.description || '');
-    formData.append('Price', data.price.toString());
-    formData.append('DurationMinutes', data.durationMinutes.toString());
+  // ==========================================
+  // 2. SERVICE MANAGEMENT
+  // ==========================================
 
-    if (file) { formData.append('image', file); }
-
-    const token = this.authService.getToken();
-    const headers = { 'Authorization': `Bearer ${token}` };
-
-    return this.http.put(`${this.baseUrl}/service/${id}`, formData, { headers });
+  addService(data: FormData): Observable<any> {
+    return this.http.post(`${this.baseUrl}/add-service`, data, this.getFormDataHeaders());
   }
 
-  // 🔥 UPDATED: Delete Service
+  updateService(id: number, data: FormData): Observable<any> {
+    return this.http.put(`${this.baseUrl}/service/${id}`, data, this.getFormDataHeaders());
+  }
+
   deleteService(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/service/${id}`, this.getHeaders());
+    return this.http.delete(`${this.baseUrl}/service/${id}`, this.getJsonHeaders());
+  }
+
+  // ==========================================
+  // 3. DASHBOARD, BOOKINGS & WALLET
+  // ==========================================
+
+  getDashboardStats(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/dashboard-stats`, this.getJsonHeaders());
+  }
+
+  getBookingRequests(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/requests`, this.getJsonHeaders());
+  }
+
+  updateBookingStatus(id: number, status: string): Observable<any> {
+    // Stringify the status to send it as a valid JSON string
+    return this.http.post(`${this.baseUrl}/booking/${id}/status`, JSON.stringify(status), this.getJsonHeaders());
+  }
+
+  completeBooking(id: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/booking/${id}/complete`, {}, this.getJsonHeaders());
+  }
+
+  topUpWallet(amount: number): Observable<any> {
+    // Stringify the amount for the backend [FromBody] decimal
+    return this.http.post(`${this.baseUrl}/wallet/top-up`, JSON.stringify(amount), this.getJsonHeaders());
   }
 }

@@ -1,0 +1,118 @@
+<div class="dashboard-content">
+  
+  <!-- HEADER -->
+  <header class="top-bar">
+    <h1>{{ activeTab | titlecase }}</h1>
+    <div class="admin-profile">
+      <span>Administrator</span>
+      <div class="avatar">A</div>
+    </div>
+  </header>
+
+  <!-- 1. OVERVIEW -->
+  <div *ngIf="activeTab === 'overview'" class="fade-in">
+    
+    <div class="stats-grid">
+      
+      <div class="stat-card purple">
+        <div class="icon"><i class="bi bi-people"></i></div>
+        <div class="info">
+          <h3>{{ stats.totalUsers || 0 }}</h3>
+          <p>Total Users</p>
+        </div>
+      </div>
+
+      <div class="stat-card blue">
+        <div class="icon"><i class="bi bi-briefcase"></i></div>
+        <div class="info">
+          <h3>{{ stats.totalBusinesses || 0 }}</h3>
+          <p>Businesses</p>
+        </div>
+      </div>
+
+      <div class="stat-card orange">
+        <div class="icon"><i class="bi bi-hourglass-split"></i></div>
+        <div class="info">
+          <h3>{{ stats.pendingApprovals || 0 }}</h3>
+          <p>Pending</p>
+        </div>
+      </div>
+
+      <div class="stat-card green">
+        <div class="icon"><i class="bi bi-calendar-check"></i></div>
+        <div class="info">
+          <h3>{{ stats.totalBookings || 0 }}</h3>
+          <p>Bookings</p>
+        </div>
+      </div>
+
+      <!-- 🔥 REVENUE CARD -->
+      <div class="stat-card revenue">
+        <div class="icon"><i class="bi bi-currency-dollar"></i></div>
+        <div class="info">
+          <!-- Uses the pipe to format as currency automatically -->
+          <h3>{{ stats.platformRevenue | currency:'USD' }}</h3>
+          <p>Platform Revenue</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 2. APPROVALS (Keep Existing) -->
+  <div *ngIf="activeTab === 'approvals'" class="fade-in">
+    <div class="table-card">
+      <h3>Pending Business Requests</h3>
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Business Name</th>
+            <th>Category</th>
+            <th>Owner</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let b of pendingBusinesses">
+            <td>{{ b.businessName }}</td>
+            <td><span class="role-badge">{{ b.category }}</span></td>
+            <td>{{ b.ownerName }}</td>
+            <td>
+              <button class="btn-icon approve" (click)="approveBusiness(b.id)">✔</button>
+              <button class="btn-icon reject" (click)="rejectBusiness(b.id)">✖</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="pendingBusinesses.length === 0" class="empty-state">No pending approvals.</div>
+    </div>
+  </div>
+
+  <!-- 3. USERS (Keep Existing) -->
+  <div *ngIf="activeTab === 'users'" class="fade-in">
+    <div class="table-card">
+      <h3>User Management</h3>
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of users">
+            <td>{{ u.fullName }}</td>
+            <td>{{ u.email }}</td>
+            <td><span class="role-badge">{{ u.role }}</span></td>
+            <td>
+              <button class="btn-icon delete" (click)="deleteUser(u.id)">🗑</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

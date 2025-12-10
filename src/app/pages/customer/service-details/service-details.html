@@ -1,1 +1,124 @@
-<p>service-details works!</p>
+<div class="page-wrapper">
+
+  <!-- LOADING -->
+  <div *ngIf="isLoading" class="d-flex justify-content-center py-5">
+    <div class="spinner-border text-primary"></div>
+  </div>
+
+  <div *ngIf="!isLoading && business">
+    
+    <!-- 1. FULL WIDTH BANNER -->
+    <div class="business-header">
+      <div class="overlay"></div>
+      
+      <button class="back-btn" (click)="goBack()">
+        <i class="bi bi-arrow-left"></i> Back
+      </button>
+      
+      <div class="container-fluid px-4 px-md-5"> 
+        <div class="profile-content">
+          <img [src]="business.profileImg" alt="Profile" class="profile-img">
+          
+          <div class="text-content">
+            <span class="category-tag">{{ business.category }}</span>
+            <h1 class="display-4 fw-bold">{{ business.name }}</h1>
+            <p class="location-text">
+              <i class="bi bi-geo-alt-fill"></i> {{ business.address }}
+            </p>
+            <p class="desc-text">{{ business.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. SERVICES SECTION -->
+    <div class="services-section">
+      <div class="container-fluid px-4 px-md-5">
+        
+        <h3 class="section-title">Services Offered</h3>
+
+        <div class="service-grid">
+          <div class="service-card" *ngFor="let service of services">
+            
+            <div class="card-img-wrapper" 
+                 [style.backgroundImage]="'url(' + service.img + ')'">
+            </div>
+
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start">
+                <h5 class="fw-bold mb-1">{{ service.name }}</h5>
+                <span class="price-tag">${{ service.price }}</span>
+              </div>
+              
+              <p class="description">{{ service.description }}</p>
+              
+              <div class="card-footer-row">
+                <span class="duration"><i class="bi bi-clock"></i> {{ service.duration }} mins</span>
+                <button class="book-btn" (click)="openBookingModal(service)">
+                  Book Now
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div *ngIf="services.length === 0" class="text-center py-5 text-muted">
+          <h4>No services listed yet.</h4>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 🔥 BOOKING MODAL -->
+<div class="modal-overlay" *ngIf="showBookingModal">
+  <div class="modal-card">
+    
+    <div class="modal-header">
+      <h4>Book Service</h4>
+      <button class="close-btn" (click)="closeModal()"><i class="bi bi-x-lg"></i></button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="service-summary mb-4">
+        <h5 class="text-purple">{{ selectedService?.name }}</h5>
+        <span class="price-badge">${{ selectedService?.price }}</span>
+      </div>
+
+      <div class="form-group mb-3">
+        <label>Select Time Slot</label>
+        <input type="datetime-local" class="form-control custom-input" [(ngModel)]="bookingData.timeSlot">
+      </div>
+
+      <div class="form-group mb-4">
+        <label>Your Location (Address)</label>
+        <input type="text" class="form-control custom-input" 
+               placeholder="e.g. 123 Main St, Colombo" [(ngModel)]="bookingData.location">
+      </div>
+
+      <!-- 🔥 PAYMENT METHOD BUTTONS -->
+      <div class="payment-section mb-4">
+        <label class="mb-2 d-block fw-bold text-muted small">Payment Method</label>
+        <div class="d-flex gap-2">
+            <button class="payment-btn" 
+                [class.active]="bookingData.paymentMethod === 'Online'"
+                (click)="selectPayment('Online')">
+                <i class="bi bi-credit-card-2-front"></i> Online Payment
+            </button>
+            
+            <button class="payment-btn" 
+                [class.active]="bookingData.paymentMethod === 'Cash'"
+                (click)="selectPayment('Cash')">
+                <i class="bi bi-cash-stack"></i> Cash on Hand
+            </button>
+        </div>
+      </div>
+
+      <button class="confirm-btn w-100" (click)="confirmBooking()">Confirm Booking</button>
+    </div>
+
+  </div>
+</div>

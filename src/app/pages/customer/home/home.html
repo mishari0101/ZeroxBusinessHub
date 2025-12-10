@@ -3,102 +3,100 @@
   <!-- HERO SECTION -->
   <div class="hero-section">
     <div class="container text-center text-white content-box">
-      <h1 class="fw-bold display-5 mb-3">Welcome back, User!</h1>
-      <p class="lead mb-4 opacity-75">Find the best services near you instantly.</p>
-
-      <!-- SEARCH BAR -->
-      <div class="search-container mx-auto">
-        <input type="text" class="form-control search-input" 
-               placeholder="Search for 'Web Design' or 'Mechanic'..." 
-               [(ngModel)]="searchQuery" (keyup.enter)="onSearch()">
+      <h1 class="fw-bold display-5 mb-3">Find Professionals Near You</h1>
+      
+      <!-- SEARCH BAR CONTAINER (FLEX) -->
+      <div class="search-container mx-auto d-flex align-items-center">
         
+        <!-- 🔥 LOCATION DROPDOWN (NEW) -->
+        <div class="location-select-wrapper">
+          <i class="bi bi-geo-alt-fill text-muted location-icon"></i>
+          <select class="form-select location-select" [(ngModel)]="selectedDistrict" (change)="onDistrictChange()">
+            <option value="" disabled selected>Your Location</option>
+            <option *ngFor="let dist of districts" [value]="dist">{{ dist }}</option>
+          </select>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- TEXT INPUT -->
+        <input type="text" class="form-control search-input" 
+               placeholder="Search for shops..." [(ngModel)]="searchQuery" (keyup.enter)="onSearch()">
+        
+        <!-- SEARCH BUTTON -->
         <button class="btn search-btn" (click)="onSearch()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="white" viewBox="0 0 16 16">
             <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
           </svg>
         </button>
       </div>
-    </div>
 
+    </div>
+    
     <div class="bg-shape shape-1"></div>
     <div class="bg-shape shape-2"></div>
   </div>
 
-  <!-- CATEGORY FILTER -->
+  <!-- CATEGORIES -->
   <div class="category-strip sticky-top">
     <div class="container-fluid d-flex gap-3 overflow-auto py-3 px-4">
-      
-      <!-- 'All' Button -->
-      <button class="category-btn" 
-              [class.active]="selectedCategory === 'All'" 
-              (click)="filterCategory('All')">
-        All
-      </button>
-
-      <!-- Dynamic Categories Loop -->
-      <button *ngFor="let cat of categories" 
-              class="category-btn" 
-              [class.active]="selectedCategory === cat" 
-              (click)="filterCategory(cat)">
-        {{ cat }}
-      </button>
-
+      <button class="category-btn" [class.active]="selectedCategory === 'All'" (click)="filterCategory('All')">All</button>
+      <button *ngFor="let cat of categories" class="category-btn" [class.active]="selectedCategory === cat" (click)="filterCategory(cat)">{{ cat }}</button>
     </div>
   </div>
 
-  <!-- SERVICE GRID -->
+  <!-- BUSINESS PROFILES GRID -->
   <div class="container-fluid px-4 py-4">
-    <h4 class="fw-bold mb-4 px-2">Recommended for you</h4>
+    
+    <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+      <h4 class="fw-bold mb-0">Top Rated Providers</h4>
+      <!-- Show current filter info -->
+      <span class="badge bg-light text-dark border" *ngIf="selectedDistrict && selectedDistrict !== 'All Island'">
+        📍 Showing in {{ selectedDistrict }}
+      </span>
+    </div>
 
-    <!-- Loading State -->
     <div *ngIf="isLoading" class="text-center py-5">
-       <p class="text-muted">Loading services...</p>
+       <div class="spinner-border text-primary"></div>
     </div>
 
     <div class="row g-4" *ngIf="!isLoading">
-      <div class="col-12 col-sm-6 col-md-4 col-lg-3" *ngFor="let service of filteredServices">
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3" *ngFor="let business of filteredBusinesses">
         
-        <!-- Service Card -->
-        <div class="service-card" (click)="viewDetails(service.id)">
+        <div class="business-card" (click)="viewBusiness(business.id)">
           <div class="card-img-wrapper">
-             
-             <!-- 🔥 REAL IMAGE LOGIC -->
-             <!-- If image exists, show it -->
-             <img *ngIf="service.img" [src]="service.img" alt="Business Image" 
-                  class="w-100 h-100" style="object-fit: cover;">
-
-             <!-- If NO image, show placeholder -->
-             <div *ngIf="!service.img" class="img-placeholder">
-                <span class="fs-1">🛠️</span>
-             </div>
-
+             <img [src]="business.img" alt="Profile">
+             <span class="category-badge">{{ business.category }}</span>
           </div>
           
-          <div class="card-body p-3">
-            <div class="d-flex align-items-center mb-2">
-              <span class="badge bg-light text-dark border me-2">{{ service.category }}</span>
-              <span class="ms-auto text-warning fw-bold">★ {{ service.rating }}</span>
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <h5 class="fw-bold mb-0 text-truncate" style="max-width: 70%;">{{ business.name }}</h5>
+                <span class="rating-badge">★ {{ business.rating }}</span>
             </div>
+
+            <p class="text-muted small mb-0 text-truncate">
+              <i class="bi bi-geo-alt-fill text-danger me-1"></i> {{ business.location }}
+            </p>
             
-            <h5 class="fw-bold mb-1">{{ service.name }}</h5>
-            <!-- Limiting location text length just in case -->
-            <p class="text-muted small mb-2">{{ service.category }} available in {{ service.location | slice:0:20 }}...</p>
-            
-            <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
-              <span class="small text-muted">STARTING AT</span>
-              <span class="fw-bold fs-5">₹{{ service.price }}</span>
+            <hr style="margin: 12px 0; opacity: 0.1;">
+
+            <div class="text-center">
+                <span class="view-btn">View Services</span>
             </div>
           </div>
         </div>
 
       </div>
-
-      <!-- No Results Found -->
-      <div *ngIf="filteredServices.length === 0 && !isLoading" class="text-center py-5">
-        <h3 class="text-muted">No services found for this category.</h3>
-      </div>
-
     </div>
-  </div>
+    
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && filteredBusinesses.length === 0" class="text-center py-5">
+        <h4 class="text-muted">No service providers found in this area.</h4>
+        <button class="btn btn-outline-primary mt-2" (click)="selectedDistrict='All Island'; onDistrictChange()">
+            Show All Island
+        </button>
+    </div>
 
+  </div>
 </div>

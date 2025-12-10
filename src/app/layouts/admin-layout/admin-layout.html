@@ -1,1 +1,37 @@
-<p>admin-layout works!</p>
+<div class="admin-wrapper">
+  
+  <!-- SIDEBAR (Fixed Left) -->
+  <aside class="sidebar">
+    <div class="brand">
+      <h2>Admin<span>Panel</span></h2>
+    </div>
+    
+    <nav class="menu">
+      <!-- These links control the Dashboard Component -->
+      <!-- Note: We use queryParams or a shared service to switch tabs, 
+           BUT since you are using one component for all tabs, we just link to dashboard -->
+      <a routerLink="/admin/dashboard" [queryParams]="{tab: 'overview'}" routerLinkActive="active">
+        <i class="bi bi-grid-fill"></i> Overview
+      </a>
+      <a routerLink="/admin/dashboard" [queryParams]="{tab: 'approvals'}" routerLinkActive="active">
+        <i class="bi bi-shop-window"></i> Approvals
+      </a>
+      <a routerLink="/admin/dashboard" [queryParams]="{tab: 'users'}" routerLinkActive="active">
+        <i class="bi bi-people-fill"></i> Users
+      </a>
+    </nav>
+
+    <!-- Logout at Bottom -->
+    <div class="sidebar-footer">
+      <button class="logout-btn" (click)="logout()">
+        <i class="bi bi-box-arrow-left"></i> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT (Fills Rest of Screen) -->
+  <main class="content-area">
+    <router-outlet></router-outlet>
+  </main>
+
+</div>

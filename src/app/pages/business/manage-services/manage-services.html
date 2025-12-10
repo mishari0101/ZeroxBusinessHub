@@ -1,115 +1,220 @@
-<div class="page-bg">
-  <div class="container-fluid px-4 py-4"> <!-- Uses Full Screen Width -->
-    
-    <!-- 1. HEADER SECTION -->
-    <div class="d-flex justify-content-between align-items-center mb-4 header-area">
-      <div>
-        <h2 class="fw-bold text-dark mb-1">My Services</h2>
-        <p class="text-muted m-0">Manage and update your service catalog.</p>
-      </div>
-      <button class="custom-btn" (click)="openModal()">
-        <i class="bi bi-plus-lg"></i> Add New Service
+<div class="dashboard-layout">
+
+  <!-- HAMBURGER BUTTON (Mobile Only) -->
+  <button class="hamburger-btn" (click)="toggleSidebar()">
+    <i class="bi bi-list"></i>
+  </button>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" [class.open]="isSidebarOpen">
+    <div class="sidebar-header">
+      <h2>Zerox<span>Hub</span></h2>
+      <button class="close-btn" (click)="toggleSidebar()"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <nav class="nav-links">
+      <a [class.active]="activeTab === 'analytics'" (click)="switchTab('analytics')"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+      <a [class.active]="activeTab === 'services'" (click)="switchTab('services')"><i class="bi bi-box-seam-fill"></i> My Services</a>
+      <a [class.active]="activeTab === 'add'" (click)="initAddService()"><i class="bi bi-plus-square-fill"></i> Add Service</a>
+      <a [class.active]="activeTab === 'notifications'" (click)="switchTab('notifications')">
+        <i class="bi bi-bell-fill"></i> Requests
+        <span class="badge" *ngIf="stats.pending > 0">{{ stats.pending }}</span>
+      </a>
+      <a [class.active]="activeTab === 'profile'" (click)="switchTab('profile')"><i class="bi bi-person-circle"></i> Profile</a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="logout-btn-animated" (click)="logout()">
+        <i class="bi bi-box-arrow-left"></i> <span>Logout</span>
       </button>
     </div>
-  
-    <!-- 2. LOADING STATE -->
-    <div *ngIf="isLoading" class="text-center py-5 text-muted">
-      <div class="spinner-border text-primary" role="status"></div>
-      <p class="mt-2">Loading services...</p>
+  </aside>
+
+  <div class="overlay" *ngIf="isSidebarOpen" (click)="toggleSidebar()"></div>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    
+    <div class="top-header">
+      <div>
+        <h1>{{ activeTab === 'analytics' ? 'Dashboard Overview' : (activeTab | titlecase) }}</h1>
+        <p class="text-muted">Hello, {{ profile.businessName || 'Partner' }} 👋</p>
+      </div>
+      <img [src]="selectedProfilePreview || 'assets/img/placeholder-profile.jpg'" class="avatar">
     </div>
-  
-    <!-- 3. EMPTY STATE -->
-    <div *ngIf="!isLoading && services.length === 0" class="text-center py-5 empty-state">
-      <img src="assets/img/loginlogo.png" alt="Empty" width="120" class="mb-3 opacity-50">
-      <h5>No Services Added Yet</h5>
-      <p class="text-muted">Click the "Add New Service" button to get started.</p>
-    </div>
-  
-    <!-- 4. SERVICES GRID (RESPONSIVE) -->
-    <!-- col-12 (Mobile), col-sm-6 (Tablet), col-lg-4 (Laptop), col-xl-3 (Wide Screen) -->
-    <div class="row g-4" *ngIf="!isLoading && services.length > 0">
-      <div class="col-12 col-sm-6 col-lg-4 col-xl-3" *ngFor="let service of services">
+
+    <!-- 1. ANALYTICS -->
+    <div *ngIf="activeTab === 'analytics'" class="fade-in">
+      <div class="stats-row">
         
-        <div class="service-card h-100">
-          <!-- Image -->
-          <div class="card-img-wrapper">
-            <div class="card-img" [style.backgroundImage]="'url(' + (service.imageUrl || 'assets/img/placeholder.jpg') + ')'"></div>
-            <span class="price-tag">${{ service.price }}</span>
+        <!-- Earnings -->
+        <div class="stat-card earnings">
+          <i class="bi bi-cash-stack"></i>
+          <div>
+            <h3>${{ stats.earnings }}</h3>
+            <p>Net Cash Collected</p>
           </div>
-          
-          <div class="card-body d-flex flex-column p-3">
-            <h5 class="fw-bold text-dark mb-2 text-truncate" title="{{ service.serviceName }}">
-              {{ service.serviceName }}
-            </h5>
-            
-            <p class="text-muted small mb-3 flex-grow-1 service-desc">
-              {{ service.description || 'No description provided.' }}
-            </p>
-  
-            <div class="d-flex align-items-center text-secondary small mb-3">
-              <span class="me-3"><i class="bi bi-clock-history"></i> {{ service.durationMinutes }} Mins</span>
-            </div>
-  
-            <!-- Action Buttons -->
-            <div class="d-flex gap-2 mt-auto">
-              <button class="btn btn-light text-primary flex-fill fw-bold border" (click)="openModal(service)">
-                Edit
-              </button>
-              <button class="btn btn-light text-danger flex-fill fw-bold border" (click)="deleteService(service.id)">
-                Delete
-              </button>
+        </div>
+
+        <!-- 🔥 CLICKABLE WALLET CARD -->
+        <div class="stat-card wallet clickable" (click)="openWalletModal()" 
+             [class.negative]="stats.walletBalance < 20">
+          <i class="bi bi-wallet2"></i>
+          <div>
+            <h3>${{ stats.walletBalance }}</h3>
+            <p>Commission Wallet</p>
+            <small *ngIf="stats.walletBalance < 20" style="color: #ef4444; font-weight: bold;">Low Balance! Top Up</small>
+            <small *ngIf="stats.walletBalance >= 20" style="color: #2ecc71;">+ Top Up</small>
+          </div>
+        </div>
+
+        <!-- Bookings -->
+        <div class="stat-card bookings">
+          <i class="bi bi-calendar-check-fill"></i>
+          <div><h3>{{ stats.bookings }}</h3><p>Jobs Done</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. SERVICES -->
+    <div *ngIf="activeTab === 'services'" class="fade-in">
+      <div class="d-flex justify-content-end mb-3">
+        <button class="btn btn-primary" (click)="initAddService()">+ Add New</button>
+      </div>
+      <div class="services-grid">
+        <div class="service-card" *ngFor="let service of services">
+          <div class="img-box" [style.backgroundImage]="'url(' + service.imageUrl + ')'"></div>
+          <div class="info-box">
+            <h5 class="text-truncate">{{ service.serviceName }}</h5>
+            <p class="price">${{ service.price }}</p>
+            <div class="actions">
+                <button class="btn-stylish edit" (click)="initEditService(service)"><i class="bi bi-pencil-fill"></i> Edit</button>
+                <button class="btn-stylish delete" (click)="deleteService(service.id)"><i class="bi bi-trash-fill"></i> Delete</button>
             </div>
           </div>
         </div>
-  
+        <div *ngIf="services.length === 0" class="col-12 text-center text-muted p-5">
+            <p>No services found. Click "Add New" to start.</p>
+        </div>
       </div>
     </div>
-  
-  </div> 
+
+    <!-- 3. ADD / EDIT SERVICE -->
+    <div *ngIf="activeTab === 'add'" class="fade-in">
+        <div class="form-card">
+            <h3>{{ isEditMode ? 'Edit Service' : 'Add New Service' }}</h3>
+            <div class="upload-box" (click)="fileInput.click()"
+                [style.backgroundImage]="selectedImagePreview ? 'url(' + selectedImagePreview + ')' : 'none'">
+                <span *ngIf="!selectedImagePreview">+ Upload Image</span>
+            </div>
+            <input type="file" #fileInput (change)="onFileSelected($event)" hidden accept="image/*">
+            <div class="form-group mb-3"><label>Service Name</label><input class="form-control" [(ngModel)]="newService.serviceName"></div>
+            <div class="row mb-3">
+                <div class="col-6"><label>Price ($)</label><input type="number" class="form-control" [(ngModel)]="newService.price"></div>
+                <div class="col-6"><label>Duration (Mins)</label><input type="number" class="form-control" [(ngModel)]="newService.durationMinutes"></div>
+            </div>
+            <div class="form-group mb-3"><label>Description</label><textarea class="form-control" rows="3" [(ngModel)]="newService.description"></textarea></div>
+            <button class="btn btn-primary w-100" (click)="saveService()">{{ isLoading ? 'Saving...' : 'Save Service' }}</button>
+        </div>
+    </div>
+
+    <!-- 4. REQUESTS -->
+    <div *ngIf="activeTab === 'notifications'" class="fade-in">
+      <h3>Recent Requests</h3>
+      <div class="request-list">
+        <div class="request-card" *ngFor="let notif of notifications">
+          <div class="req-info">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="mb-0 fw-bold">{{ notif.customerName }}</h5>
+                <span class="price-tag">${{ notif.price }}</span>
+            </div>
+            <p class="service-title">Requested: <strong class="text-primary">{{ notif.serviceName }}</strong></p>
+            <div class="booking-details">
+                <p><i class="bi bi-calendar-event text-warning"></i> {{ notif.bookingTimeSlot | date:'medium' }}</p>
+                <p><i class="bi bi-geo-alt-fill text-danger"></i> {{ notif.customerLocation }}</p>
+                
+                <!-- 🔥 PAYMENT METHOD -->
+                <p class="mt-2">
+                    <span class="payment-badge" 
+                          [class.online]="notif.paymentMethod === 'Online'"
+                          [class.cash]="notif.paymentMethod === 'Cash'">
+                        <i class="bi" [class.bi-credit-card-2-front]="notif.paymentMethod === 'Online'" 
+                           [class.bi-cash-stack]="notif.paymentMethod === 'Cash'"></i> 
+                        {{ notif.paymentMethod || 'Cash' }}
+                    </span>
+                </p>
+            </div>
+          </div>
+          <div class="req-actions">
+            <button class="btn-accept" (click)="acceptBooking(notif)">Accept</button>
+            <button class="btn-decline" (click)="declineBooking(notif.id)">Decline</button>
+          </div>
+        </div>
+        <div *ngIf="notifications.length === 0" class="text-muted p-4 text-center border rounded bg-white">
+          No new requests pending.
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. PROFILE -->
+    <div *ngIf="activeTab === 'profile'" class="fade-in">
+        <div class="form-card profile-section">
+            <div class="profile-header-row">
+                <h3 class="mb-0">Profile Details</h3>
+                <button class="edit-icon-btn" (click)="toggleProfileEdit()" *ngIf="!isEditingProfile" title="Edit Profile">
+                    <i class="bi bi-pencil-fill"></i>
+                </button>
+            </div>
+            <div class="profile-pic-wrapper mb-4">
+                <div class="pic-container" [class.editable]="isEditingProfile" (click)="isEditingProfile && profileInput.click()">
+                    <img [src]="selectedProfilePreview" alt="Profile">
+                    <div class="overlay" *ngIf="isEditingProfile"><i class="bi bi-camera-fill"></i></div>
+                </div>
+                <input type="file" #profileInput (change)="onProfilePicSelected($event)" hidden accept="image/*">
+            </div>
+            <div class="profile-form" [class.editing]="isEditingProfile">
+                <div class="mb-3"><label>Business Name</label><input class="form-control profile-input" [(ngModel)]="profile.businessName" [disabled]="!isEditingProfile"></div>
+                <div class="mb-3"><label>Address</label><input class="form-control profile-input" [(ngModel)]="profile.address" [disabled]="!isEditingProfile"></div>
+                <div class="row mb-3">
+                    <div class="col-6"><label>District</label><input class="form-control profile-input" [(ngModel)]="profile.district" [disabled]="!isEditingProfile"></div>
+                    <div class="col-6"><label>Phone</label><input class="form-control profile-input" [(ngModel)]="profile.phone" [disabled]="!isEditingProfile"></div>
+                </div>
+                <div class="profile-actions" *ngIf="isEditingProfile">
+                    <button class="btn-cancel" (click)="cancelProfileEdit()">Cancel</button>
+                    <button class="btn-save-profile" (click)="saveProfile()"><span *ngIf="!isLoading"><i class="bi bi-check-circle-fill"></i> Save Changes</span><span *ngIf="isLoading">Saving...</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  </main>
 </div>
 
-<!-- MODAL REMAINS SAME (Just verify it exists below) -->
-<div class="modal-overlay" *ngIf="showModal">
-  <div class="modal-content">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h4 class="fw-bold">{{ isEditMode ? 'Edit Service' : 'Add New Service' }}</h4>
-      <button class="btn-close" (click)="closeModal()"></button>
+<!-- 🔥 WALLET TOP-UP MODAL -->
+<div class="modal-overlay" *ngIf="showWalletModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h4>Top Up Wallet</h4>
+      <button class="close-btn" (click)="closeWalletModal()"><i class="bi bi-x-lg"></i></button>
     </div>
+    
+    <div class="modal-body text-center">
+      <p class="text-muted mb-4">Add money to your commission wallet to accept more bookings.</p>
+      
+      <div class="amount-input-wrapper mb-4">
+        <span class="currency">$</span>
+        <input type="number" [(ngModel)]="topUpAmount" class="amount-input" placeholder="0">
+      </div>
 
-    <!-- Image Upload -->
-    <label class="form-label small fw-bold text-muted">Service Image</label>
-    <div class="image-upload-container mb-3">
-      <div class="upload-box" (click)="fileInput.click()" *ngIf="!selectedImagePreview">
-        <span>+</span>
+      <div class="quick-amounts mb-4">
+        <button class="btn btn-outline-secondary btn-sm" (click)="topUpAmount = 50">$50</button>
+        <button class="btn btn-outline-secondary btn-sm" (click)="topUpAmount = 100">$100</button>
+        <button class="btn btn-outline-secondary btn-sm" (click)="topUpAmount = 500">$500</button>
       </div>
-      <div class="preview-box" *ngIf="selectedImagePreview" (click)="fileInput.click()">
-        <img [src]="selectedImagePreview" alt="Preview">
-      </div>
-      <input type="file" #fileInput (change)="onFileSelected($event)" hidden accept="image/*">
-    </div>
 
-    <!-- Form -->
-    <div class="mb-3">
-      <label class="form-label small fw-bold text-muted">Service Name</label>
-      <input type="text" class="form-control" placeholder="e.g. Haircut" [(ngModel)]="newService.serviceName">
+      <button class="btn btn-primary w-100 py-2" (click)="confirmTopUp()">
+        Pay & Top Up
+      </button>
     </div>
-    <div class="mb-3">
-      <label class="form-label small fw-bold text-muted">Description</label>
-      <textarea class="form-control" rows="2" [(ngModel)]="newService.description"></textarea>
-    </div>
-    <div class="row mb-4">
-      <div class="col-6">
-        <label class="form-label small fw-bold text-muted">Price ($)</label>
-        <input type="number" class="form-control" [(ngModel)]="newService.price">
-      </div>
-      <div class="col-6">
-        <label class="form-label small fw-bold text-muted">Duration (Mins)</label>
-        <input type="number" class="form-control" [(ngModel)]="newService.durationMinutes">
-      </div>
-    </div>
-
-    <button class="custom-btn w-100" (click)="saveService()" [disabled]="isLoading">
-      {{ isLoading ? 'Saving...' : 'Save Service' }}
-    </button>
   </div>
 </div>

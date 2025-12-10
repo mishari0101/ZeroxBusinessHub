@@ -1,9 +1,89 @@
-.text-purple { color: #6a11cb; }
-.btn-purple { background: #6a11cb; border: none; }
-.btn-outline-purple { border-color: #6a11cb; color: #6a11cb; }
+/* Navbar Styles */
+.navbar {
+  padding: 15px 0;
+  transition: all 0.3s ease-in-out;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px); /* Glass effect */
+}
 
-.main-content {
-  margin-top: 70px; 
-  min-height: 100vh;
-  background-color: #f8f9fa;
+/* 🔥 BRAND LOGO STYLE (Matches Business/Admin Dash) */
+.brand-logo {
+  font-size: 1.8rem;
+  font-weight: 800; /* Extra Bold */
+  color: #1e1e2f;   /* Dark Color for 'Zerox' */
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: -0.5px;
+
+  /* The 'Hub' part becomes Purple */
+  span {
+    color: #6a11cb;
+  }
+
+  &:hover {
+    color: #1e1e2f; /* Prevent link hover color change */
+  }
+}
+
+/* BUTTONS */
+.btn-purple {
+  background: linear-gradient(135deg, #6a11cb, #8A2BE2);
+  border: none;
+  padding: 8px 24px;
+  border-radius: 30px;
+  font-weight: 600;
+  transition: 0.3s;
+  box-shadow: 0 4px 15px rgba(106, 17, 203, 0.2);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(106, 17, 203, 0.4);
+  }
+}
+
+.btn-outline-purple {
+  border: 2px solid #6a11cb;
+  color: #6a11cb;
+  padding: 8px 24px;
+  border-radius: 30px;
+  font-weight: 600;
+  transition: 0.3s;
+  background: transparent;
+
+  &:hover {
+    background: #6a11cb;
+    color: white;
+  }
+}
+
+/* LOGOUT BUTTON STYLE */
+.logout-btn {
+  border: 2px solid #ff4757;
+  color: #ff4757;
+  padding: 8px 20px;
+  border-radius: 30px;
+  font-weight: 600;
+  transition: 0.3s;
+  background: transparent;
+
+  &:hover {
+    background: #ff4757;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .brand-logo {
+    font-size: 1.4rem;
+  }
+  
+  .btn-purple, .btn-outline-purple, .logout-btn {
+    padding: 6px 14px;
+    font-size: 0.85rem;
+  }
 }

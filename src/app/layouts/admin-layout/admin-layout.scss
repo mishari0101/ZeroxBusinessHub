@@ -1,0 +1,62 @@
+/* LAYOUT CONTAINER */
+.admin-wrapper {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background: #f4f7fe;
+  overflow: hidden;
+}
+
+/* SIDEBAR (Fixed Width) */
+.sidebar {
+  width: 260px;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  padding: 25px;
+  border-right: 1px solid #eee;
+  flex-shrink: 0; /* Prevents shrinking */
+  z-index: 100;
+  
+  .brand h2 {
+    font-size: 1.6rem; font-weight: 800; color: #1e1e2f; margin-bottom: 40px;
+    span { color: #6a11cb; }
+  }
+
+  .menu {
+    display: flex; flex-direction: column; gap: 8px;
+    
+    a {
+      padding: 12px 15px; border-radius: 10px; color: #666; font-weight: 500; text-decoration: none;
+      display: flex; align-items: center; gap: 12px; transition: 0.3s;
+      
+      &:hover { background: #f8f9fa; color: #6a11cb; }
+      &.active { 
+        background: linear-gradient(135deg, #6a11cb, #8A2BE2); 
+        color: white; 
+        box-shadow: 0 4px 15px rgba(106, 17, 203, 0.3); 
+      }
+    }
+  }
+
+  /* Logout at Bottom */
+  .sidebar-footer {
+    margin-top: auto;
+    
+    .logout-btn {
+      width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 12px; background: #fff0f0; color: #ff4757; border: none;
+      border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s;
+      
+      &:hover { background: #ff4757; color: white; }
+    }
+  }
+}
+
+/* MAIN CONTENT AREA (Takes remaining space) */
+.content-area {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 30px 40px;
+  width: calc(100% - 260px); /* Specific width calculation */
+}

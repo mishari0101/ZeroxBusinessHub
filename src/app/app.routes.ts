@@ -6,27 +6,29 @@ import { VerifyComponent } from './pages/verify/verify.component';
 // --- LAYOUTS ---
 import { BusinessLayoutComponent } from './layouts/business-layout/business-layout'; 
 import { CustomerLayoutComponent } from './layouts/customer-layout/customer-layout';
+import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout'; // 🔥 FIXED IMPORT NAME
 
 // --- PAGES ---
 import { ProfileSetupComponent } from './pages/business/profile-setup/profile-setup';
 import { ManageServicesComponent } from './pages/business/manage-services/manage-services';
 import { DashboardComponent } from './pages/business/dashboard/dashboard'; 
 import { HomeComponent } from './pages/customer/home/home';
-
 import { ServiceDetails } from './pages/customer/service-details/service-details';
+import { CustomerDashboardComponent } from './pages/customer/dashboard/dashboard'; 
+import { AdminDashboardComponent } from './pages/admin/dashboard/dashboard'; 
 
 export const routes: Routes = [
   
   // ==========================================
   // 1. CUSTOMER ROUTES (Root Path)
-  // This must be FIRST so localhost:4200 loads Home
   // ==========================================
   { 
     path: '', 
     component: CustomerLayoutComponent,
     children: [
-      { path: '', component: HomeComponent },
-      { path: 'service-details/:id', component: ServiceDetails }
+      { path: '', component: HomeComponent }, // Default Home Page
+      { path: 'service-details/:id', component: ServiceDetails }, // Service Details
+      { path: 'customer/dashboard', component: CustomerDashboardComponent } // Customer Dashboard
     ]
   },
 
@@ -44,27 +46,22 @@ export const routes: Routes = [
     path: 'business', 
     component: BusinessLayoutComponent,
     children: [
-      // Dashboard (Main Page for Business)
       { path: 'dashboard', component: DashboardComponent }, 
-
-      // Setup Profile (First time only)
       { path: 'profile-setup', component: ProfileSetupComponent },
-
-      // Manage Services
       { path: 'manage-services', component: ManageServicesComponent }
     ]
   },
 
   // ==========================================
-  // 4. ADMIN ROUTES (Commented out for now)
+  // 4. ADMIN ROUTES
   // ==========================================
-  /*
   {
     path: 'admin',
-    component: AdminLayoutComponent,
+    component: AdminLayoutComponent, // Uses Admin Sidebar Layout
     children: [
-      // { path: 'dashboard', component: AdminDashboardComponent }
+       { path: 'dashboard', component: AdminDashboardComponent },
+       // Redirect /admin to /admin/dashboard by default
+       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   }
-  */
 ];

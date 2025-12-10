@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { BusinessService } from '../../../services/business.service'; 
+import { BusinessService } from '../../../services/business.service';
 
 @Component({
   selector: 'app-profile-setup',
@@ -14,35 +14,42 @@ import { BusinessService } from '../../../services/business.service';
 export class ProfileSetupComponent {
 
   model: any = {
-    category: ''
+    businessName: '',
+    category: '',
+    description: '',
+    address: '',
+    district: '',
+    phone: '',
+    workingHours: ''
   };
+
+  selectedFile: File | null = null; // Store RAW file here
+  selectedImagePreview: string | null = null;
   errorMessage: string = '';
   isLoading: boolean = false;
 
-  // New Variables for Image
-  selectedFile: File | null = null;
-  selectedImagePreview: string | null = null;
-
   categories = [
-    'Salon & Spa',
-    'Mechanic & Auto Repair',
-    'Medical Clinic',
-    'Gym & Fitness',
-    'Home Cleaning',
-    'Tutor / Education',
-    'Plumber / Electrician',
-    'Event Planner'
+    'Salon & Spa', 'Mechanic & Auto Repair', 'Medical Clinic',
+    'Gym & Fitness', 'Home Cleaning', 'Tutor / Education',
+    'Plumber / Electrician', 'Event Planner'
+  ];
+
+  districts = [
+    'Ampara', 'Anuradhapura', 'Badulla', 'Batticaloa', 'Colombo', 'Galle', 'Gampaha', 
+    'Hambantota', 'Jaffna', 'Kalutara', 'Kandy', 'Kegalle', 'Kilinochchi', 'Kurunegala', 
+    'Mannar', 'Matale', 'Matara', 'Monaragala', 'Mullaitivu', 'Nuwara Eliya', 
+    'Polonnaruwa', 'Puttalam', 'Ratnapura', 'Trincomalee', 'Vavuniya'
   ];
 
   constructor(private businessService: BusinessService, private router: Router) {}
 
-  // 1. Handle File Selection
+  // Handle Image Selection
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
-      this.selectedFile = file;
-      
-      // Show Preview
+      this.selectedFile = file; // Store raw file for upload
+
+      // Create preview for UI only
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.selectedImagePreview = e.target.result;
@@ -51,13 +58,26 @@ export class ProfileSetupComponent {
     }
   }
 
-  // 2. Submit Form
   onSubmit() {
     this.errorMessage = '';
     this.isLoading = true;
 
-    // Pass 'selectedFile' to the service (FormData handled in service)
-    this.businessService.registerBusiness(this.model, this.selectedFile).subscribe({
+    // Create FormData (Correct way to send File + Data)
+    const formData = new FormData();
+    formData.append('BusinessName', this.model.businessName);
+    formData.append('Category', this.model.category);
+    formData.append('Description', this.model.description || '');
+    formData.append('Address', this.model.address);
+    formData.append('District', this.model.district);
+    formData.append('Phone', this.model.phone);
+    formData.append('WorkingHours', this.model.workingHours || '');
+
+    // Append Image if selected
+    if (this.selectedFile) {
+      formData.append('image', this.selectedFile); // Key 'image' matches Backend IFormFile
+    }
+
+    this.businessService.registerBusiness(formData).subscribe({
       next: (res) => {
         console.log('Business Created:', res);
         this.isLoading = false;

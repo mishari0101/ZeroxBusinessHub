@@ -1,5 +1,3 @@
-<!-- src/app/pages/register/register.component.html -->
-
 <div class="register-wrapper fade-in-up">
   <div class="row g-0 h-100">
     
@@ -14,7 +12,7 @@
 
     <!-- Right Side: Registration Form -->
     <div class="col-md-7 d-flex align-items-center justify-content-center right-panel">
-      <div class="form-box w-75 py-4"> <!-- Added py-4 for spacing -->
+      <div class="form-box w-75 py-4">
         <h3 class="fw-bold mb-1 text-dark">Create Account</h3>
         <p class="text-muted small mb-4">Please fill in your details to register.</p>
 
@@ -28,44 +26,50 @@
           <!-- Full Name -->
           <div class="mb-3">
             <input type="text" class="form-control custom-input" placeholder="Full Name"
-                   name="fullName" [(ngModel)]="model.fullName" required>
+                   name="fullName" [(ngModel)]="model.fullName" required [disabled]="isLoading">
           </div>
 
           <!-- Contact Info -->
           <div class="mb-3">
             <input type="text" class="form-control custom-input" placeholder="Email or Phone Number"
-                   name="email" [(ngModel)]="model.email" required>
+                   name="email" [(ngModel)]="model.email" required [disabled]="isLoading">
             <small class="text-muted ms-2" style="font-size: 11px;">We'll send a code to verify this.</small>
+          </div>
+
+          <!-- District Dropdown (Customer Only) -->
+          <div class="mb-3" *ngIf="model.role === 'Customer'">
+            <select class="form-select custom-input" name="district" [(ngModel)]="model.district" required [disabled]="isLoading">
+              <option value="" disabled selected>Select Your District</option>
+              <option *ngFor="let dist of districts" [value]="dist">{{ dist }}</option>
+            </select>
           </div>
 
           <!-- Password Row -->
           <div class="row mb-3">
             <div class="col-6">
               <input type="password" class="form-control custom-input" placeholder="Password"
-                     name="password" [(ngModel)]="model.password" required>
+                     name="password" [(ngModel)]="model.password" required [disabled]="isLoading">
             </div>
             <div class="col-6">
               <input type="password" class="form-control custom-input" placeholder="Confirm"
-                     name="confirmPassword" [(ngModel)]="model.confirmPassword" required>
+                     name="confirmPassword" [(ngModel)]="model.confirmPassword" required [disabled]="isLoading">
             </div>
           </div>
 
-          <!-- Role Selection (Premium Cards) -->
+          <!-- Role Selection -->
           <label class="small text-muted fw-bold mb-2 d-block">I am a:</label>
           <div class="d-flex gap-3 mb-4">
             
-            <!-- Customer Option -->
             <div class="role-option flex-fill">
-              <input type="radio" name="role" value="Customer" id="roleCust" [(ngModel)]="model.role" hidden>
+              <input type="radio" name="role" value="Customer" id="roleCust" [(ngModel)]="model.role" hidden [disabled]="isLoading">
               <label for="roleCust" class="role-card">
                 <span class="role-icon">👤</span>
                 <span>Customer</span>
               </label>
             </div>
 
-            <!-- Business Option -->
             <div class="role-option flex-fill">
-              <input type="radio" name="role" value="BusinessOwner" id="roleBiz" [(ngModel)]="model.role" hidden>
+              <input type="radio" name="role" value="BusinessOwner" id="roleBiz" [(ngModel)]="model.role" hidden [disabled]="isLoading">
               <label for="roleBiz" class="role-card">
                 <span class="role-icon">💼</span>
                 <span>Business</span>
@@ -73,8 +77,11 @@
             </div>
           </div>
 
-          <!-- Register Button -->
-          <button type="submit" class="btn btn-primary w-100 custom-btn mb-3">REGISTER</button>
+          <!-- 🔥 UPDATED REGISTER BUTTON -->
+          <button type="submit" class="btn btn-primary w-100 custom-btn mb-3" [disabled]="!registerForm.form.valid || isLoading">
+            <span *ngIf="!isLoading">REGISTER</span>
+            <span *ngIf="isLoading">REGISTERING...</span>
+          </button>
 
           <div class="text-center small">
             Already have an account? <a routerLink="/login" class="fw-bold text-primary text-decoration-none">Login</a>

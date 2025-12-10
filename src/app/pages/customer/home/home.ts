@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-// Note: importing from 'public' because your file is named public.ts
-import { PublicService } from '../../../services/public'; 
+import { CustomerService } from '../../../services/customer.service';
 
 @Component({
   selector: 'app-home',
@@ -16,83 +15,84 @@ export class HomeComponent implements OnInit {
 
   searchQuery: string = '';
   selectedCategory: string = 'All';
-  isLoading: boolean = true;
+  
+  // 🔥 NEW: Selected District (Default is empty = use Registered User Location)
+  selectedDistrict: string = ''; 
+  isLoading: boolean = true; 
 
-  // 1. Categories (Starts with All, fills dynamically from DB)
-  categories: string[] = ['All']; 
+  // Sri Lanka Districts (+ All Island Option)
+  districts = [
+    'All Island',
+    'Ampara', 'Anuradhapura', 'Badulla', 'Batticaloa', 'Colombo', 'Galle', 'Gampaha', 
+    'Hambantota', 'Jaffna', 'Kalutara', 'Kandy', 'Kegalle', 'Kilinochchi', 'Kurunegala', 
+    'Mannar', 'Matale', 'Matara', 'Monaragala', 'Mullaitivu', 'Nuwara Eliya', 
+    'Polonnaruwa', 'Puttalam', 'Ratnapura', 'Trincomalee', 'Vavuniya'
+  ];
 
-  // 2. Data Arrays
-  services: any[] = [];
-  filteredServices: any[] = [];
+  categories = ['Mechanic', 'Salon', 'Cleaning', 'Plumber', 'Electrician', 'Tutor'];
+  
+  businesses: any[] = [];
+  filteredBusinesses: any[] = [];
 
-  constructor(
-    private router: Router,
-    private publicService: PublicService
-  ) {}
+  constructor(private router: Router, private customerService: CustomerService) {} 
 
   ngOnInit() {
-    this.loadData();
+    this.loadBusinesses();
   }
 
-  // 🔥 Fetch Real Data from API
-  loadData() {
+  // 🔥 UPDATED: Load Logic
+  loadBusinesses() {
     this.isLoading = true;
-    this.publicService.getAllBusinesses().subscribe({
-      next: (data) => {
-        console.log('API Data:', data);
+    
+    // Pass the selectedDistrict (if it's empty, backend uses registered address)
+    this.customerService.getAllBusinesses(this.selectedDistrict).subscribe({
+      next: (data: any) => {
+        if (!data) { this.isLoading = false; return; }
 
-        // Map Backend DTO (BusinessViewDto) to Frontend Variables
-        this.services = data.map((b: any) => ({
-            id: b.id,
-            name: b.businessName,        // mapped from businessName
-            category: b.category,        // mapped from category
-            location: b.address,         // mapped from address
-            rating: 4.5,                 // Default rating (backend doesn't send yet)
-            price: 500,                  // Default starting price
-            img: b.businessImage         // mapped from businessImage
+        this.businesses = data.map((item: any) => ({
+          id: item.id || item.Id,
+          name: item.businessName || item.BusinessName, 
+          category: item.category || item.Category || 'Service', 
+          location: item.address || item.Address || 'City Center',
+          district: item.district || item.District, // Store district
+          rating: item.rating || 4.5, 
+          img: item.img || 'assets/img/placeholder-profile.jpg' 
         }));
 
-        this.filteredServices = this.services;
-
-        // 🔥 Fix: Dynamic Categories
-        // Extract unique categories from the data and add them to the list
-        const uniqueCats = [...new Set(data.map((b: any) => b.category))];
-        this.categories = ['All', ...uniqueCats as string[]];
-
+        this.filteredBusinesses = this.businesses;
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('Error fetching data:', err);
+        console.error('API Error:', err);
         this.isLoading = false;
       }
     });
   }
 
-  // Filter Logic
+  // 🔥 NEW: Handle District Dropdown Change
+  onDistrictChange() {
+    this.loadBusinesses(); // Reload data from backend based on new selection
+  }
+
+  onSearch() {
+    this.filterBusinesses();
+  }
+
   filterCategory(category: string) {
     this.selectedCategory = category;
-    if (category === 'All') {
-      this.filteredServices = this.services;
-    } else {
-      this.filteredServices = this.services.filter(s => s.category === category);
-    }
+    this.filterBusinesses();
   }
 
-  // Search Logic
-  onSearch() {
-    if (this.searchQuery.trim()) {
-      const query = this.searchQuery.toLowerCase();
-      this.filteredServices = this.services.filter(s => 
-        s.name.toLowerCase().includes(query) || 
-        s.category.toLowerCase().includes(query)
-      );
-    } else {
-      this.filteredServices = this.services;
-    }
+  filterBusinesses() {
+    this.filteredBusinesses = this.businesses.filter(b => {
+      const matchesCategory = this.selectedCategory === 'All' || b.category.includes(this.selectedCategory);
+      const matchesSearch = b.name.toLowerCase().includes(this.searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
   }
 
-  // Navigation Logic
-  viewDetails(id: number) {
-    this.router.navigate(['/customer/business', id]);
+  viewBusiness(id: any) {
+    console.log("Navigating to business ID:", id);
+    this.router.navigate(['/service-details', id]); 
   }
 }
