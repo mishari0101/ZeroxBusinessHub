@@ -11,7 +11,6 @@
 
   <!-- 1. OVERVIEW -->
   <div *ngIf="activeTab === 'overview'" class="fade-in">
-    
     <div class="stats-grid">
       
       <div class="stat-card purple">
@@ -46,11 +45,9 @@
         </div>
       </div>
 
-      <!-- 🔥 REVENUE CARD -->
       <div class="stat-card revenue">
         <div class="icon"><i class="bi bi-currency-dollar"></i></div>
         <div class="info">
-          <!-- Uses the pipe to format as currency automatically -->
           <h3>{{ stats.platformRevenue | currency:'USD' }}</h3>
           <p>Platform Revenue</p>
         </div>
@@ -59,7 +56,7 @@
     </div>
   </div>
 
-  <!-- 2. APPROVALS (Keep Existing) -->
+  <!-- 2. APPROVALS -->
   <div *ngIf="activeTab === 'approvals'" class="fade-in">
     <div class="table-card">
       <h3>Pending Business Requests</h3>
@@ -75,11 +72,11 @@
         <tbody>
           <tr *ngFor="let b of pendingBusinesses">
             <td>{{ b.businessName }}</td>
-            <td><span class="role-badge">{{ b.category }}</span></td>
+            <td><span class="tag">{{ b.category }}</span></td>
             <td>{{ b.ownerName }}</td>
             <td>
-              <button class="btn-icon approve" (click)="approveBusiness(b.id)">✔</button>
-              <button class="btn-icon reject" (click)="rejectBusiness(b.id)">✖</button>
+              <button class="btn-icon approve" (click)="confirmApprove(b.id)">✔</button>
+              <button class="btn-icon reject" (click)="confirmReject(b.id)">✖</button>
             </td>
           </tr>
         </tbody>
@@ -88,7 +85,7 @@
     </div>
   </div>
 
-  <!-- 3. USERS (Keep Existing) -->
+  <!-- 3. USERS -->
   <div *ngIf="activeTab === 'users'" class="fade-in">
     <div class="table-card">
       <h3>User Management</h3>
@@ -107,7 +104,7 @@
             <td>{{ u.email }}</td>
             <td><span class="role-badge">{{ u.role }}</span></td>
             <td>
-              <button class="btn-icon delete" (click)="deleteUser(u.id)">🗑</button>
+              <button class="btn-icon delete" (click)="confirmDeleteUser(u.id)">🗑</button>
             </td>
           </tr>
         </tbody>
@@ -115,4 +112,46 @@
     </div>
   </div>
 
+</div>
+
+<!-- ============================================== -->
+<!-- 🔥 CUSTOM CONFIRMATION MODAL -->
+<!-- ============================================== -->
+<div class="custom-modal-overlay" *ngIf="showConfirmModal">
+  <div class="custom-modal">
+    
+    <!-- 🔥 UPDATED: USING IMAGES INSTEAD OF ICONS -->
+    <div class="icon-circle" [ngClass]="modalType">
+      
+      <!-- Trash Image (Red) -->
+      <img *ngIf="modalType === 'delete'" 
+           src="https://img.icons8.com/fluency/96/filled-trash.png" 
+           alt="Delete">
+      
+      <!-- Check Image (Green) -->
+      <img *ngIf="modalType === 'approve'" 
+           src="https://img.icons8.com/fluency/96/ok.png" 
+           alt="Approve">
+      
+      <!-- X Image (Orange) -->
+      <img *ngIf="modalType === 'reject'" 
+           src="https://img.icons8.com/fluency/96/cancel.png" 
+           alt="Reject">
+
+    </div>
+
+    <h3>{{ modalTitle }}</h3>
+    <p>{{ modalMessage }}</p>
+
+    <div class="modal-actions">
+      <button class="btn-modal cancel" (click)="closeModal()">Cancel</button>
+      
+      <button class="btn-modal" 
+              [ngClass]="modalType"
+              (click)="onConfirmAction()">
+        {{ modalBtnText }}
+      </button>
+    </div>
+
+  </div>
 </div>

@@ -63,7 +63,7 @@
                    [(ngModel)]="model.address" placeholder="No. 123, Main Street" required>
           </div>
           
-          <!-- 🔥 NEW DISTRICT DROPDOWN -->
+          <!-- DISTRICT DROPDOWN -->
           <div class="col-md-6 mt-3 mt-md-0">
             <label class="form-label">District</label>
             <select class="form-select custom-input" name="district" [(ngModel)]="model.district" required>
@@ -96,5 +96,26 @@
       </form>
     </div>
 
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- 🔥 CUSTOM SUCCESS MODAL -->
+<!-- ============================================== -->
+<div class="success-overlay" *ngIf="showSuccessModal">
+  <div class="success-card">
+    
+    <!-- Animated Checkmark -->
+    <div class="icon-circle">
+      <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+        <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
+        <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+      </svg>
+    </div>
+
+    <h3>Success!</h3>
+    <p>Business Profile Created Successfully!</p>
+    
+    <button class="btn-success-close" (click)="onCloseModal()">Continue</button>
   </div>
 </div>

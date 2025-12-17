@@ -23,11 +23,17 @@ export class ServiceDetails implements OnInit {
   showBookingModal: boolean = false;
   selectedService: any = null;
   
+  // 🔥 Success Modal State
+  showSuccessModal: boolean = false;
+
+  // Toggle State
+  isDescriptionExpanded: boolean = false;
+
   // Form Data
   bookingData = {
     timeSlot: '',
     location: '',
-    paymentMethod: 'Cash' // Default
+    paymentMethod: 'Cash'
   };
 
   constructor(
@@ -72,6 +78,10 @@ export class ServiceDetails implements OnInit {
     });
   }
 
+  toggleDescription() {
+    this.isDescriptionExpanded = !this.isDescriptionExpanded;
+  }
+
   // --- BOOKING LOGIC ---
 
   openBookingModal(service: any) {
@@ -85,11 +95,9 @@ export class ServiceDetails implements OnInit {
 
   closeModal() {
     this.showBookingModal = false;
-    // Reset Data
     this.bookingData = { timeSlot: '', location: '', paymentMethod: 'Cash' };
   }
 
-  // Select Payment Method
   selectPayment(method: string) {
     this.bookingData.paymentMethod = method;
   }
@@ -109,14 +117,20 @@ export class ServiceDetails implements OnInit {
 
     this.customerService.createBooking(payload).subscribe({
       next: () => {
-        alert("Booking Request Sent Successfully!");
-        this.closeModal();
+        // 🔥 CLOSE FORM & SHOW SUCCESS MODAL
+        this.showBookingModal = false;
+        this.showSuccessModal = true;
       },
       error: (err) => {
         console.error(err);
         alert("Booking Failed. Please try again.");
       }
     });
+  }
+  
+  closeSuccessModal() {
+    this.showSuccessModal = false;
+    this.bookingData = { timeSlot: '', location: '', paymentMethod: 'Cash' }; // Reset
   }
   
   goBack() { this.router.navigate(['/']); }

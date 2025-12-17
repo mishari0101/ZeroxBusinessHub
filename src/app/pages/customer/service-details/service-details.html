@@ -25,7 +25,18 @@
             <p class="location-text">
               <i class="bi bi-geo-alt-fill"></i> {{ business.address }}
             </p>
-            <p class="desc-text">{{ business.description }}</p>
+            
+            <div class="description-box">
+              <p [class.truncated]="!isDescriptionExpanded" class="desc-text">
+                {{ business.description }}
+              </p>
+              <button class="read-more-btn" 
+                      *ngIf="business.description?.length > 150" 
+                      (click)="toggleDescription()">
+                {{ isDescriptionExpanded ? 'Show Less' : 'Read More' }}
+              </button>
+            </div>
+
           </div>
         </div>
       </div>
@@ -73,13 +84,13 @@
   </div>
 </div>
 
-<!-- 🔥 BOOKING MODAL -->
+<!-- BOOKING FORM MODAL -->
 <div class="modal-overlay" *ngIf="showBookingModal">
   <div class="modal-card">
     
     <div class="modal-header">
       <h4>Book Service</h4>
-      <button class="close-btn" (click)="closeModal()"><i class="bi bi-x-lg"></i></button>
+      <button class="close-btn" (click)="closeModal()">✕</button>
     </div>
     
     <div class="modal-body">
@@ -99,7 +110,6 @@
                placeholder="e.g. 123 Main St, Colombo" [(ngModel)]="bookingData.location">
       </div>
 
-      <!-- 🔥 PAYMENT METHOD BUTTONS -->
       <div class="payment-section mb-4">
         <label class="mb-2 d-block fw-bold text-muted small">Payment Method</label>
         <div class="d-flex gap-2">
@@ -120,5 +130,23 @@
       <button class="confirm-btn w-100" (click)="confirmBooking()">Confirm Booking</button>
     </div>
 
+  </div>
+</div>
+
+<!-- 🔥 SUCCESS MODAL WITH ANIMATED CHECKMARK -->
+<div class="success-overlay" *ngIf="showSuccessModal">
+  <div class="success-card">
+    
+    <!-- SVG Animation -->
+    <div class="success-animation">
+      <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+        <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
+        <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+      </svg>
+    </div>
+
+    <h3>Success!</h3>
+    <p>Booking Request Sent Successfully!</p>
+    <button class="btn-success-close" (click)="closeSuccessModal()">Awesome</button>
   </div>
 </div>

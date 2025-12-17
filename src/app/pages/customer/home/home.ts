@@ -1,13 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common'; // 🔥 CRITICAL IMPORT
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { BusinessService } from '../../../services/business.service';
+import { AuthService } from '../../../services/auth.service';
 import { CustomerService } from '../../../services/customer.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  // 🔥 CRITICAL: CommonModule MUST be here for *ngIf and *ngFor to work
+  imports: [CommonModule, FormsModule], 
   templateUrl: './home.html',
   styleUrls: ['./home.scss']
 })
@@ -15,15 +18,14 @@ export class HomeComponent implements OnInit {
 
   searchQuery: string = '';
   selectedCategory: string = 'All';
-  
-  // 🔥 NEW: Selected District (Default is empty = use Registered User Location)
-  selectedDistrict: string = ''; 
+  selectedDistrict: string = 'All Island';
   isLoading: boolean = true; 
+  
+  // Track Login Status
+  isLoggedIn: boolean = false;
 
-  // Sri Lanka Districts (+ All Island Option)
   districts = [
-    'All Island',
-    'Ampara', 'Anuradhapura', 'Badulla', 'Batticaloa', 'Colombo', 'Galle', 'Gampaha', 
+    'All Island', 'Ampara', 'Anuradhapura', 'Badulla', 'Batticaloa', 'Colombo', 'Galle', 'Gampaha', 
     'Hambantota', 'Jaffna', 'Kalutara', 'Kandy', 'Kegalle', 'Kilinochchi', 'Kurunegala', 
     'Mannar', 'Matale', 'Matara', 'Monaragala', 'Mullaitivu', 'Nuwara Eliya', 
     'Polonnaruwa', 'Puttalam', 'Ratnapura', 'Trincomalee', 'Vavuniya'
@@ -33,18 +35,27 @@ export class HomeComponent implements OnInit {
   
   businesses: any[] = [];
   filteredBusinesses: any[] = [];
+  topProviders: any[] = [];
 
-  constructor(private router: Router, private customerService: CustomerService) {} 
+  constructor(
+    private router: Router, 
+    private customerService: CustomerService,
+    private businessService: BusinessService, 
+    private authService: AuthService
+  ) {} 
 
   ngOnInit() {
+    // 1. Check if User is Logged In
+    this.isLoggedIn = this.authService.isLoggedIn();
+
+    // 2. Load Data
     this.loadBusinesses();
   }
 
-  // 🔥 UPDATED: Load Logic
   loadBusinesses() {
     this.isLoading = true;
     
-    // Pass the selectedDistrict (if it's empty, backend uses registered address)
+    // Get All Businesses
     this.customerService.getAllBusinesses(this.selectedDistrict).subscribe({
       next: (data: any) => {
         if (!data) { this.isLoading = false; return; }
@@ -54,12 +65,13 @@ export class HomeComponent implements OnInit {
           name: item.businessName || item.BusinessName, 
           category: item.category || item.Category || 'Service', 
           location: item.address || item.Address || 'City Center',
-          district: item.district || item.District, // Store district
+          district: item.district || item.District, 
           rating: item.rating || 4.5, 
           img: item.img || 'assets/img/placeholder-profile.jpg' 
         }));
 
         this.filteredBusinesses = this.businesses;
+        this.topProviders = this.businesses.slice(0, 3); 
         this.isLoading = false;
       },
       error: (err) => {
@@ -69,9 +81,8 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  // 🔥 NEW: Handle District Dropdown Change
   onDistrictChange() {
-    this.loadBusinesses(); // Reload data from backend based on new selection
+    this.loadBusinesses(); 
   }
 
   onSearch() {
@@ -92,7 +103,10 @@ export class HomeComponent implements OnInit {
   }
 
   viewBusiness(id: any) {
-    console.log("Navigating to business ID:", id);
     this.router.navigate(['/service-details', id]); 
+  }
+  
+  goToDetails(id: any) {
+    this.router.navigate(['/service-details', id]);
   }
 }

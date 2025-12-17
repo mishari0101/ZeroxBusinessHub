@@ -1,14 +1,14 @@
 <div class="home-wrapper">
 
-  <!-- HERO SECTION -->
+  <!-- 1. HERO SECTION -->
   <div class="hero-section">
     <div class="container text-center text-white content-box">
-      <h1 class="fw-bold display-5 mb-3">Find Professionals Near You</h1>
+      <h1 class="fw-bold display-5 mb-3 animate-up">Find Professionals Near You</h1>
       
-      <!-- SEARCH BAR CONTAINER (FLEX) -->
-      <div class="search-container mx-auto d-flex align-items-center">
+      <!-- SEARCH BAR CONTAINER -->
+      <div class="search-container mx-auto d-flex align-items-center animate-up delay-1">
         
-        <!-- 🔥 LOCATION DROPDOWN (NEW) -->
+        <!-- LOCATION DROPDOWN -->
         <div class="location-select-wrapper">
           <i class="bi bi-geo-alt-fill text-muted location-icon"></i>
           <select class="form-select location-select" [(ngModel)]="selectedDistrict" (change)="onDistrictChange()">
@@ -37,7 +37,7 @@
     <div class="bg-shape shape-2"></div>
   </div>
 
-  <!-- CATEGORIES -->
+  <!-- 2. CATEGORY PILLS -->
   <div class="category-strip sticky-top">
     <div class="container-fluid d-flex gap-3 overflow-auto py-3 px-4">
       <button class="category-btn" [class.active]="selectedCategory === 'All'" (click)="filterCategory('All')">All</button>
@@ -45,12 +45,52 @@
     </div>
   </div>
 
-  <!-- BUSINESS PROFILES GRID -->
-  <div class="container-fluid px-4 py-4">
+  <!-- 3. 🔥 FEATURES SECTION (HIDDEN IF LOGGED IN) -->
+  <section class="features-section" *ngIf="!isLoggedIn">
+    <div class="container">
+      <div class="row g-4">
+        
+        <div class="col-md-3 col-6">
+          <div class="feature-card orange bounce-delay-1">
+            <div class="icon-box"><i class="bi bi-shield-check"></i></div>
+            <h5>Verified Providers</h5>
+            <p>Trusted and reliable service</p>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-6">
+          <div class="feature-card blue bounce-delay-2">
+            <div class="icon-box"><i class="bi bi-globe-asia-australia"></i></div>
+            <h5>Island-wide Coverage</h5>
+            <p>Services across Sri Lanka</p>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-6">
+          <div class="feature-card green bounce-delay-3">
+            <div class="icon-box"><i class="bi bi-cash-coin"></i></div>
+            <h5>Best Rates</h5>
+            <p>Competitive local pricing</p>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-6">
+          <div class="feature-card purple bounce-delay-4">
+            <div class="icon-box"><i class="bi bi-stars"></i></div>
+            <h5>Quality Service</h5>
+            <p>Satisfaction guaranteed</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. BUSINESS PROFILES GRID (ALWAYS VISIBLE) -->
+  <div class="container-fluid px-4 py-4 min-vh-50">
     
     <div class="d-flex justify-content-between align-items-center mb-4 px-2">
       <h4 class="fw-bold mb-0">Top Rated Providers</h4>
-      <!-- Show current filter info -->
       <span class="badge bg-light text-dark border" *ngIf="selectedDistrict && selectedDistrict !== 'All Island'">
         📍 Showing in {{ selectedDistrict }}
       </span>
@@ -99,4 +139,80 @@
     </div>
 
   </div>
+
+  <!-- 5. 🔥 HOW IT WORKS (HIDDEN IF LOGGED IN) -->
+  <section class="how-it-works" *ngIf="!isLoggedIn">
+    <div class="container text-center">
+      <p class="text-muted text-uppercase fw-bold small mb-2">Easy Process</p>
+      <h2 class="section-title mb-5">Get started in just a few simple steps</h2>
+      
+      <div class="row justify-content-center g-4">
+        
+        <!-- Step 1 -->
+        <div class="col-md-4">
+          <div class="step-card">
+            <div class="step-circle">1</div>
+            <h4>Search</h4>
+            <p>Find the service you need using our advanced search feature.</p>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="col-md-4">
+          <div class="step-card">
+            <div class="step-circle">2</div>
+            <h4>Connect</h4>
+            <p>Connect with trusted service providers in your area instantly.</p>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="col-md-4">
+          <div class="step-card">
+            <div class="step-circle">3</div>
+            <h4>Book</h4>
+            <p>Book your service and get the job done hassle-free.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. FOOTER (ALWAYS VISIBLE) -->
+  <footer class="main-footer">
+    <div class="container">
+      <div class="footer-content">
+        
+        <div class="footer-brand">
+          <h2>Zerox<span>Hub</span></h2>
+          <p>Connecting you with the best professionals in Sri Lanka.</p>
+        </div>
+        
+        <div class="footer-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+          <a href="#">Support</a>
+        </div>
+        
+         <div class="social-icons">
+          <a href="#" class="social-link facebook">
+            <img src="https://img.icons8.com/fluency/48/facebook-new.png" alt="Facebook">
+          </a>
+          <a href="#" class="social-link instagram">
+            <img src="https://img.icons8.com/fluency/48/instagram-new.png" alt="Instagram">
+          </a>
+          <a href="#" class="social-link twitter">
+            <img src="https://img.icons8.com/fluency/48/twitterx.png" alt="X (Twitter)">
+          </a>
+        </div>
+
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; 2025 ZeroxHub. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
 </div>

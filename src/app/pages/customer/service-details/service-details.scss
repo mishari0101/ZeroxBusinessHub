@@ -55,7 +55,25 @@
 }
 
 .location-text { font-size: 1.2rem; opacity: 0.95; }
-.desc-text { font-size: 1rem; opacity: 0.85; max-width: 800px; }
+
+.desc-text { 
+  font-size: 1rem; opacity: 0.9; max-width: 800px; 
+  line-height: 1.6; margin-bottom: 5px;
+}
+
+.truncated {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.read-more-btn {
+  background: none; border: none; color: #fff; 
+  font-weight: 700; font-size: 0.9rem; cursor: pointer;
+  text-decoration: underline; padding: 0; margin-top: 5px;
+  &:hover { color: #ddd; }
+}
 
 
 /* 3. SERVICES GRID */
@@ -122,13 +140,21 @@
 .modal-card {
   background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 420px;
   box-shadow: 0 25px 80px rgba(0,0,0,0.25); animation: slideUp 0.3s ease-out;
+  position: relative; 
 }
 
 @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
 .modal-header h4 { margin: 0; font-weight: 800; color: #333; }
-.close-btn { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: #999; &:hover { color: #333; } }
+
+.close-btn { 
+  background: #f3f4f6; border: none; width: 36px; height: 36px; 
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; font-weight: 700; color: #333; line-height: 1; padding-bottom: 2px;
+  cursor: pointer; transition: 0.2s;
+  &:hover { background: #e5e7eb; color: #000; transform: rotate(90deg); } 
+}
 
 .service-summary {
   display: flex; justify-content: space-between; align-items: center; 
@@ -140,13 +166,11 @@
 .form-group label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; color: #555; }
 .custom-input { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #eee; background: white; &:focus { border-color: #6a11cb; box-shadow: none; } }
 
-/* 🔥 PAYMENT BUTTONS */
 .payment-section { margin-top: 15px; }
 .payment-btn {
   flex: 1; padding: 10px; border: 2px solid #eee; background: white; border-radius: 10px;
   font-weight: 600; color: #666; cursor: pointer; transition: 0.2s;
   display: flex; align-items: center; justify-content: center; gap: 8px;
-  
   &:hover { background: #f8f9fa; }
   &.active { border-color: #6a11cb; color: #6a11cb; background: rgba(106, 17, 203, 0.05); box-shadow: 0 4px 10px rgba(106, 17, 203, 0.1); }
 }
@@ -157,6 +181,57 @@
   cursor: pointer; transition: 0.3s;
   &:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(106, 17, 203, 0.3); }
 }
+
+/* =========================================
+   🔥 SUCCESS MODAL & ANIMATION
+   ========================================= */
+.success-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1100;
+  display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);
+}
+
+.success-card {
+  background: white; padding: 40px; border-radius: 24px; text-align: center;
+  box-shadow: 0 30px 100px rgba(0,0,0,0.5); width: 320px;
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.success-card h3 { font-weight: 800; color: #333; margin-bottom: 10px; margin-top: 15px; }
+.success-card p { color: #666; margin-bottom: 25px; font-size: 0.95rem; }
+
+.btn-success-close {
+  background: #166534; color: white; border: none; padding: 12px 30px;
+  border-radius: 30px; font-weight: 600; cursor: pointer; transition: 0.3s; width: 100%;
+  &:hover { background: #14532d; transform: translateY(-2px); }
+}
+
+/* 🔥 CHECKMARK ANIMATION */
+.success-animation { margin-bottom: 10px; }
+
+.checkmark {
+    width: 80px; height: 80px; border-radius: 50%; display: block;
+    stroke-width: 2; stroke: #166534; stroke-miterlimit: 10;
+    margin: 0 auto;
+    box-shadow: inset 0px 0px 0px #166534;
+    animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+}
+
+.checkmark__circle {
+    stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 2;
+    stroke-miterlimit: 10; stroke: #166534; fill: #dcfce7;
+    animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.checkmark__check {
+    transform-origin: 50% 50%; stroke-dasharray: 48; stroke-dashoffset: 48;
+    animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+}
+
+@keyframes stroke { 100% { stroke-dashoffset: 0; } }
+@keyframes scale { 0%, 100% { transform: none; } 50% { transform: scale3d(1.1, 1.1, 1); } }
+@keyframes fill { 100% { box-shadow: inset 0px 0px 0px 50px #dcfce7; } }
 
 /* MOBILE */
 @media (max-width: 768px) {

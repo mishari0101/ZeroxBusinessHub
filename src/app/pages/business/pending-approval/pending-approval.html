@@ -1,0 +1,89 @@
+<div class="pending-page">
+  
+  <!-- BACKGROUND SHAPES -->
+  <div class="shape shape-1"></div>
+  <div class="shape shape-2"></div>
+
+  <div class="container d-flex justify-content-center align-items-center min-vh-100">
+    
+    <!-- MAIN STATUS CARD -->
+    <div class="status-card fade-in">
+      
+      <div class="icon-wrapper floating">
+        <i class="bi bi-hourglass-split"></i>
+      </div>
+
+      <h1 class="title">Account Under Review</h1>
+      
+      <p class="description">
+        Thank you for registering your business with <strong>ZeroxHub</strong>.<br>
+        Our admin team is currently verifying your details to ensure quality and trust.
+      </p>
+
+      <div class="status-badge-container">
+        <span class="status-badge pulse">
+          <span class="dot"></span> Status: Pending Approval
+        </span>
+      </div>
+
+      <div class="info-box">
+        <i class="bi bi-info-circle-fill"></i>
+        <p>This process usually takes <strong>24 hours</strong>. You will receive an email notification once approved.</p>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn-refresh" (click)="checkStatus()">
+          <span *ngIf="!isLoading">Check Status</span>
+          <div *ngIf="isLoading" class="spinner-border spinner-border-sm"></div>
+        </button>
+        
+        <button class="btn-logout" (click)="logout()">
+          <i class="bi bi-box-arrow-left"></i> Logout
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ============================================== -->
+<!-- 🔥 CUSTOM MODALS (Notifications) -->
+<!-- ============================================== -->
+
+<!-- 1. STILL PENDING MODAL -->
+<div class="custom-modal-overlay" *ngIf="showPendingModal">
+  <div class="custom-modal">
+    <div class="icon-circle info">
+      <i class="bi bi-clock-history"></i>
+    </div>
+    <h3>Still Pending</h3>
+    <p>Your account is still under review. Please check back later or check your email for updates.</p>
+    <button class="btn-modal info" (click)="closeModals()">Okay, I'll Wait</button>
+  </div>
+</div>
+
+<!-- 2. APPROVED MODAL -->
+<div class="custom-modal-overlay" *ngIf="showApprovedModal">
+  <div class="custom-modal">
+    <div class="icon-circle success">
+      <i class="bi bi-check-lg"></i>
+    </div>
+    <h3>Approved!</h3>
+    <p>Congratulations! Your account is now active. You can access your dashboard.</p>
+    <button class="btn-modal success" (click)="goToDashboard()">Go to Dashboard</button>
+  </div>
+</div>
+
+<!-- 3. REJECTED MODAL -->
+<div class="custom-modal-overlay" *ngIf="showRejectedModal">
+  <div class="custom-modal">
+    <div class="icon-circle error">
+      <i class="bi bi-x-lg"></i>
+    </div>
+    <h3>Application Rejected</h3>
+    <p>We're sorry, but your application was not approved. Please contact support for more details.</p>
+    <button class="btn-modal error" (click)="closeModals()">Close</button>
+  </div>
+</div>

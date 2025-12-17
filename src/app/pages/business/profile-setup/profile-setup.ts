@@ -27,6 +27,9 @@ export class ProfileSetupComponent {
   selectedImagePreview: string | null = null;
   errorMessage: string = '';
   isLoading: boolean = false;
+  
+  // 🔥 MODAL STATE
+  showSuccessModal: boolean = false;
 
   categories = [
     'Salon & Spa', 'Mechanic & Auto Repair', 'Medical Clinic',
@@ -81,8 +84,9 @@ export class ProfileSetupComponent {
       next: (res) => {
         console.log('Business Created:', res);
         this.isLoading = false;
-        alert('Business Profile Created Successfully!');
-        this.router.navigate(['/business/manage-services']); 
+        
+        // 🔥 SHOW MODAL
+        this.showSuccessModal = true;
       },
       error: (err) => {
         console.error('Error:', err);
@@ -90,5 +94,11 @@ export class ProfileSetupComponent {
         this.errorMessage = err.error?.Message || 'Failed to create business profile.';
       }
     });
+  }
+  
+  // 🔥 CLOSE MODAL & REDIRECT
+  onCloseModal() {
+    this.showSuccessModal = false;
+    this.router.navigate(['/business/pending']); // Redirect to Pending Page
   }
 }

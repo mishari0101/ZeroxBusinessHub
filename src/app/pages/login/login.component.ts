@@ -28,30 +28,42 @@ export class LoginComponent {
   ) { }
 
   onSubmit(): void {
-    this.errorMessage = '';
-    
-    this.authService.login(this.model).subscribe({
-      next: (response) => {
-        console.log('Login successful!', response);
-        this.authService.saveToken(response.token);
+  this.errorMessage = '';
+  
+  this.authService.login(this.model).subscribe({
+    next: (response) => {
+      this.authService.saveToken(response.token);
+      
+      // 🔥 NEW REDIRECT LOGIC
+      if (response.role === 'BusinessOwner') {
         
-        if (response.role === 'Admin') {
-           // 🔥 FIXED: Redirect to Dashboard, not Approvals
-           this.router.navigate(['/admin/dashboard']);
+        if (response.status === 'None') {
+          // 1. New User -> Go to Profile Setup
+          this.router.navigate(['/business/profile-setup']);
         } 
-        else if (response.role === 'BusinessOwner') {
-           this.checkBusinessProfileAndRedirect();
+        else if (response.status === 'Pending') {
+          // 2. Profile Submitted but not Approved -> Go to Pending Page
+          this.router.navigate(['/business/pending']);
+        } 
+        else if (response.status === 'Active') {
+          // 3. Approved -> Go to Dashboard
+          this.router.navigate(['/business/manage-services']);
         } 
         else {
-           this.router.navigate(['/']); 
+          alert("Your account has been suspended or rejected.");
         }
-      },
-      error: (err) => {
-        console.error('Login failed', err);
-        this.errorMessage = err.error?.Message || 'Login failed. Please check your credentials.';
+
+      } else if (response.role === 'Admin') {
+        this.router.navigate(['/admin/dashboard']);
+      } else {
+        this.router.navigate(['/']); 
       }
-    });
-  }
+    },
+    error: (err) => {
+      this.errorMessage = err.error?.Message || 'Login failed.';
+    }
+  });
+}
 
   checkBusinessProfileAndRedirect() {
     this.businessService.getMyProfile().subscribe({

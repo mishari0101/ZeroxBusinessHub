@@ -1,0 +1,43 @@
+<div class="chat-container">
+  
+  <!-- HEADER -->
+  <div class="chat-header">
+    <h3>💬 Booking #{{ bookingId }}</h3>
+    <button class="btn-refresh" (click)="loadMessages()">
+      <i class="bi bi-arrow-clockwise"></i> Refresh
+    </button>
+  </div>
+
+  <!-- MESSAGES AREA -->
+  <div class="chat-history">
+    
+    <div *ngIf="messages.length === 0 && !isLoading" class="empty-state">
+      <p>No messages yet. Start the conversation!</p>
+    </div>
+
+    <!-- Loop Messages -->
+    <div *ngFor="let msg of messages" 
+         class="message-wrapper" 
+         [class.me]="msg.isMe" 
+         [class.other]="!msg.isMe">
+      
+      <div class="bubble">
+        <p>{{ msg.messageText }}</p>
+        <span class="time">{{ msg.timeSent }}</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- INPUT AREA -->
+  <div class="chat-footer">
+    <input type="text" [(ngModel)]="newMessage" 
+           (keyup.enter)="sendMessage()"
+           placeholder="Type a message..." class="chat-input">
+    
+    <button class="btn-send" (click)="sendMessage()">
+      Send ➤
+    </button>
+  </div>
+
+</div>

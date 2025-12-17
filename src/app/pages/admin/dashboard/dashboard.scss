@@ -9,11 +9,8 @@
 /* STATS GRID */
 .stats-grid {
   display: grid;
-  /* 🔥 CHANGE: Use auto-fit to handle 5 cards elegantly */
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
-  gap: 25px;
-  width: 100%;
-  margin-bottom: 30px;
+  gap: 25px; width: 100%; margin-bottom: 30px;
 }
 
 .stat-card {
@@ -28,8 +25,6 @@
   &.blue .icon { background: linear-gradient(135deg, #00c6ff, #0072ff); }
   &.orange .icon { background: linear-gradient(135deg, #f093fb, #f5576c); }
   &.green .icon { background: linear-gradient(135deg, #11998e, #38ef7d); }
-
-  /* New Color for Revenue */
   &.revenue .icon { background: linear-gradient(135deg, #FFD700, #FDB931); color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
 
   h3 { margin: 0; font-size: 1.8rem; font-weight: 700; color: #1e1e2f; }
@@ -39,7 +34,72 @@
 /* TABLE STYLES */
 .table-card { background: white; padding: 30px; border-radius: 16px; box-shadow: 0 5px 20px rgba(0,0,0,0.03); }
 .custom-table { width: 100%; border-collapse: collapse; th, td { padding: 15px; text-align: left; border-bottom: 1px solid #f4f4f4; } }
-.btn-icon { border: none; width: 35px; height: 35px; border-radius: 8px; cursor: pointer; margin-right: 5px; display: inline-flex; align-items: center; justify-content: center; }
-.approve { background: #dcfce7; color: #166534; } .reject { background: #fee2e2; color: #991b1b; } .delete { background: #fee2e2; color: #991b1b; }
+.btn-icon { border: none; width: 35px; height: 35px; border-radius: 8px; cursor: pointer; margin-right: 5px; display: inline-flex; align-items: center; justify-content: center; transition: 0.2s; }
+.btn-icon:hover { transform: scale(1.1); }
+
+.approve { background: #dcfce7; color: #166534; } 
+.reject { background: #fee2e2; color: #991b1b; } 
+.delete { background: #fee2e2; color: #991b1b; }
+
 .empty-state { text-align: center; padding: 30px; color: #aaa; }
 .role-badge { background: #eee; padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; }
+
+/* =========================================
+   🔥 CUSTOM MODAL STYLES (UPDATED)
+   ========================================= */
+.custom-modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 2000;
+  display: flex; align-items: center; justify-content: center; backdrop-filter: blur(6px);
+}
+
+.custom-modal {
+  background: white; padding: 40px; border-radius: 24px; text-align: center;
+  box-shadow: 0 30px 100px rgba(0,0,0,0.5); width: 380px; max-width: 90%;
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* 🔥 ICON CIRCLE (NOW HOLDS IMG) */
+.icon-circle {
+  width: 80px; height: 80px; border-radius: 50%; 
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px; 
+  
+  &.delete { background: #fee2e2; }
+  &.approve { background: #dcfce7; }
+  &.reject { background: #fff7ed; }
+
+  img {
+    width: 45px; height: 45px;
+    object-fit: contain;
+  }
+}
+
+/* 🔥 SHAKE ANIMATION FOR DELETE IMAGE */
+.icon-circle.delete img {
+  animation: trashShake 0.5s ease-in-out 0.2s both;
+}
+
+@keyframes trashShake {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-15deg); }
+  50% { transform: rotate(15deg); }
+  75% { transform: rotate(-5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.custom-modal h3 { font-weight: 800; color: #333; margin-bottom: 10px; }
+.custom-modal p { color: #666; margin-bottom: 30px; font-size: 0.95rem; line-height: 1.5; }
+
+.modal-actions { display: flex; gap: 15px; justify-content: center; }
+
+.btn-modal {
+  padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; font-size: 0.95rem;
+  
+  &.cancel { background: #f3f4f6; color: #333; &:hover { background: #e5e7eb; } }
+  
+  &.delete { background: #ef4444; color: white; &:hover { background: #dc2626; } }
+  &.approve { background: #166534; color: white; &:hover { background: #14532d; } }
+  &.reject { background: #f97316; color: white; &:hover { background: #ea580c; } }
+}

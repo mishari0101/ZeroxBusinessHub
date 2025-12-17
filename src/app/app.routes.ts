@@ -6,7 +6,7 @@ import { VerifyComponent } from './pages/verify/verify.component';
 // --- LAYOUTS ---
 import { BusinessLayoutComponent } from './layouts/business-layout/business-layout'; 
 import { CustomerLayoutComponent } from './layouts/customer-layout/customer-layout';
-import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout'; // 🔥 FIXED IMPORT NAME
+import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout'; 
 
 // --- PAGES ---
 import { ProfileSetupComponent } from './pages/business/profile-setup/profile-setup';
@@ -16,11 +16,13 @@ import { HomeComponent } from './pages/customer/home/home';
 import { ServiceDetails } from './pages/customer/service-details/service-details';
 import { CustomerDashboardComponent } from './pages/customer/dashboard/dashboard'; 
 import { AdminDashboardComponent } from './pages/admin/dashboard/dashboard'; 
+import { PendingApprovalComponent } from './pages/business/pending-approval/pending-approval';
+import { ChatComponent } from './pages/common/chat/chat'; // 🔥 Import Chat
 
 export const routes: Routes = [
   
   // ==========================================
-  // 1. CUSTOMER ROUTES (Root Path)
+  // 1. CUSTOMER & SHARED ROUTES (Root Path)
   // ==========================================
   { 
     path: '', 
@@ -28,7 +30,10 @@ export const routes: Routes = [
     children: [
       { path: '', component: HomeComponent }, // Default Home Page
       { path: 'service-details/:id', component: ServiceDetails }, // Service Details
-      { path: 'customer/dashboard', component: CustomerDashboardComponent } // Customer Dashboard
+      { path: 'customer/dashboard', component: CustomerDashboardComponent }, // Customer Dashboard
+      
+      // 🔥 NEW: CHAT ROUTE (Accessible by Customer & Provider)
+      { path: 'chat/:id', component: ChatComponent } 
     ]
   },
 
@@ -48,6 +53,7 @@ export const routes: Routes = [
     children: [
       { path: 'dashboard', component: DashboardComponent }, 
       { path: 'profile-setup', component: ProfileSetupComponent },
+      { path: 'pending', component: PendingApprovalComponent },
       { path: 'manage-services', component: ManageServicesComponent }
     ]
   },
@@ -57,10 +63,9 @@ export const routes: Routes = [
   // ==========================================
   {
     path: 'admin',
-    component: AdminLayoutComponent, // Uses Admin Sidebar Layout
+    component: AdminLayoutComponent, 
     children: [
        { path: 'dashboard', component: AdminDashboardComponent },
-       // Redirect /admin to /admin/dashboard by default
        { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   }

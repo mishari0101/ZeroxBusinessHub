@@ -20,29 +20,31 @@ export class ManageServicesComponent implements OnInit {
   isLoading: boolean = false;
   isEditingProfile: boolean = false;
 
-  // 🔥 WALLET MODAL STATE
+  // 🔥 CUSTOM MODAL STATE
+  showSuccessModal: boolean = false;
+  showConfirmModal: boolean = false;
+  showErrorModal: boolean = false;
+  
+  modalMessage: string = '';
+  confirmTitle: string = '';
+  confirmMessage: string = '';
+  errorMessage: string = '';
+  
+  onConfirmAction: () => void = () => {};
+
+  // Wallet Modal
   showWalletModal: boolean = false;
   topUpAmount: number = 0;
 
-  // Real-Time Stats
-  stats = { 
-    earnings: 0, 
-    bookings: 0, 
-    pending: 0,
-    walletBalance: 0 
-  };
-
+  stats = { earnings: 0, bookings: 0, pending: 0, walletBalance: 0 };
   services: any[] = [];
   notifications: any[] = []; 
   profile: any = {};
 
-  // Add/Edit Service Model
   isEditMode: boolean = false;
   newService: any = { id: 0, serviceName: '', description: '', price: 0, durationMinutes: 30 };
   selectedFile: File | null = null;
   selectedImagePreview: string | null = null;
-
-  // Profile Image Model
   selectedProfileFile: File | null = null;
   selectedProfilePreview: string | null = null;
 
@@ -52,17 +54,13 @@ export class ManageServicesComponent implements OnInit {
     private router: Router 
   ) {}
 
-  ngOnInit() {
-    this.loadDashboardData();
-  }
+  ngOnInit() { this.loadDashboardData(); }
 
-  // --- LOGOUT ---
   logout() {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
 
-  // --- NAVIGATION ---
   toggleSidebar() { this.isSidebarOpen = !this.isSidebarOpen; }
 
   switchTab(tab: string) {
@@ -70,66 +68,98 @@ export class ManageServicesComponent implements OnInit {
     if(window.innerWidth < 768) this.isSidebarOpen = false;
   }
 
-  // --- LOAD DATA ---
+  // --- 🔥 UPDATED LOAD DATA LOGIC ---
   loadDashboardData() {
     this.isLoading = true;
     
-    // 1. Get Profile & Earnings
+    // 1. Get Profile (For Image, Services, Wallet, Earnings)
     this.businessService.getMyProfile().subscribe({
       next: (data) => {
         this.profile = data;
         this.selectedProfilePreview = data.businessImage || 'assets/img/placeholder-profile.jpg';
         this.services = (data.services || []).map((s: any) => ({
-          ...s,
-          imageUrl: s.imageUrl || s.serviceImage || 'assets/img/placeholder.jpg'
+          ...s, imageUrl: s.imageUrl || s.serviceImage || 'assets/img/placeholder.jpg'
         }));
-
-        // 🔥 MAP WALLET DATA
-        this.stats.earnings = data.totalEarnings || 0; // Net Cash Collected
-        this.stats.walletBalance = data.walletBalance || 0; // Commission Wallet
-
-        this.isLoading = false;
+        
+        // Map Wallet & Earnings directly from Profile
+        this.stats.earnings = data.totalEarnings || 0;
+        this.stats.walletBalance = data.walletBalance || 0;
       },
       error: (err) => { console.error(err); this.isLoading = false; }
     });
 
-    // 2. Get Requests
+    // 2. 🔥 FIX: Get "Jobs Done" Count from Stats API
+    this.businessService.getDashboardStats().subscribe({
+      next: (data: any) => {
+        this.stats.bookings = data.jobsDone || 0; // Fixes "Jobs Done" showing 0
+        this.stats.pending = data.pendingCount || 0;
+        this.isLoading = false;
+      },
+      error: (err) => console.error("Stats Error:", err)
+    });
+
+    // 3. Get Requests List
     this.businessService.getBookingRequests().subscribe({
       next: (requests: any) => {
         this.notifications = requests;
-        this.stats.pending = requests.length;
+        // Fallback: If stats API fails, we count pending here
+        if(this.stats.pending === 0) this.stats.pending = requests.filter((r: any) => r.status === 'Pending').length;
       }
     });
   }
 
-  // --- 🔥 WALLET ACTIONS ---
-  openWalletModal() {
-    console.log("Opening Wallet Modal...");
-    this.showWalletModal = true;
-    this.topUpAmount = 0;
+  // --- CHAT NAVIGATION ---
+  goToChat(bookingId: number) {
+    this.router.navigate(['/chat', bookingId]);
   }
 
-  closeWalletModal() {
-    this.showWalletModal = false;
+  // --- MODAL TRIGGERS ---
+  triggerSuccess(msg: string) {
+    this.modalMessage = msg;
+    this.showSuccessModal = true;
   }
+
+  triggerError(msg: string) {
+    this.errorMessage = msg;
+    this.showErrorModal = true;
+  }
+
+  triggerConfirm(title: string, msg: string, action: () => void) {
+    this.confirmTitle = title;
+    this.confirmMessage = msg;
+    this.onConfirmAction = () => {
+      action();
+      this.closeModals();
+    };
+    this.showConfirmModal = true;
+  }
+
+  closeModals() {
+    this.showSuccessModal = false;
+    this.showConfirmModal = false;
+    this.showErrorModal = false;
+  }
+
+  // --- WALLET ---
+  openWalletModal() { this.showWalletModal = true; this.topUpAmount = 0; }
+  closeWalletModal() { this.showWalletModal = false; }
 
   confirmTopUp() {
     if (this.topUpAmount <= 0) {
       alert("Please enter a valid amount");
       return;
     }
-
     this.businessService.topUpWallet(this.topUpAmount).subscribe({
       next: () => {
-        alert(`Successfully added $${this.topUpAmount} to wallet!`);
         this.closeWalletModal();
-        this.loadDashboardData(); // Refresh stats to update balance
+        this.loadDashboardData(); 
+        this.triggerSuccess(`Successfully added $${this.topUpAmount} to wallet!`);
       },
       error: () => alert("Top-up failed.")
     });
   }
 
-  // --- PROFILE ACTIONS ---
+  // --- PROFILE ---
   toggleProfileEdit() { this.isEditingProfile = !this.isEditingProfile; }
 
   onProfilePicSelected(event: any) {
@@ -150,14 +180,11 @@ export class ManageServicesComponent implements OnInit {
     formData.append('District', this.profile.district);
     formData.append('Phone', this.profile.phone || '');
     formData.append('Category', this.profile.category); 
-
-    if (this.selectedProfileFile) {
-      formData.append('image', this.selectedProfileFile);
-    }
+    if (this.selectedProfileFile) formData.append('image', this.selectedProfileFile);
 
     this.businessService.updateProfile(formData).subscribe({
       next: () => {
-        alert('Profile Updated Successfully!');
+        this.triggerSuccess('Profile Updated Successfully!');
         this.isEditingProfile = false;
         this.loadDashboardData(); 
       },
@@ -170,54 +197,56 @@ export class ManageServicesComponent implements OnInit {
     this.loadDashboardData(); 
   }
 
-  // --- 🔥 UPDATED BOOKING ACTIONS (80/20 Logic) ---
-  acceptBooking(booking: any) {
-    // 1. Calculate the Split
-    const fullPrice = booking.price;            // e.g., $800
-    const commission = fullPrice * 0.20;        // e.g., $160 (20%)
-    const netEarnings = fullPrice - commission; // e.g., $640 (Net Cash)
+  // --- BOOKING LOGIC ---
+  
+  initAcceptBooking(booking: any) {
+    const fullPrice = booking.price;
+    const commission = fullPrice * 0.20;
+    const netEarnings = fullPrice - commission;
 
-    // 2. Check Wallet Balance
     if (this.stats.walletBalance < commission) {
-      alert(`⚠️ Insufficient Commission Wallet Balance! 
-      
-      To accept this job (Price: $${fullPrice}), a platform fee of $${commission} is required.
-      Your current wallet balance is only $${this.stats.walletBalance}.
-      
-      Please Top-Up your wallet to proceed.`);
-      this.openWalletModal();
+      this.triggerError(`
+        <strong>Insufficient Commission Wallet Balance!</strong><br><br>
+        To accept this job (Price: $${fullPrice}), a platform fee of <b>$${commission}</b> is required.<br>
+        Your current balance is only <b>$${this.stats.walletBalance}</b>.
+      `);
       return;
     }
 
-    // 3. Confirm Dialog
-    if (!confirm(`Accept this job for $${fullPrice}?
-    
-    --------------------------------
-    💰 Platform Commission (20%): -$${commission} (Deducted from Wallet)
-    💵 Your Net Earning: +$${netEarnings} (Added to Dashboard)
-    --------------------------------
-    
-    Click OK to Accept.`)) {
-      return;
-    }
-
-    // 4. Send to Backend (Backend does the money subtraction)
-    this.businessService.updateBookingStatus(booking.id, 'Accepted').subscribe({
-      next: () => {
-        alert(`Booking Accepted! Commission of $${commission} has been deducted.`);
-        this.loadDashboardData(); // Reloads stats to show updated Net Earnings & Wallet
-      },
-      error: (err) => alert(err.error?.Message || "Failed to accept booking.")
-    });
+    this.triggerConfirm(
+      'Accept Job?',
+      `Are you sure you want to accept this booking?<br><br>
+       <div style="text-align:left; background:#f9f9f9; padding:10px; border-radius:10px;">
+         💰 <b>Commission (20%):</b> <span style="color:#ef4444">-$${commission}</span> (From Wallet)<br>
+         💵 <b>Net Earning:</b> <span style="color:#166534">+$${netEarnings}</span> (Added to Cash)
+       </div>
+      `,
+      () => {
+        this.businessService.updateBookingStatus(booking.id, 'Accepted').subscribe({
+          next: () => {
+            this.loadDashboardData();
+            this.triggerSuccess(`Booking Accepted! Commission of $${commission} deducted.`);
+          },
+          error: (err) => alert(err.error?.Message || "Failed to accept booking.")
+        });
+      }
+    );
   }
 
-  declineBooking(id: number) {
-    if(confirm('Decline this request?')) {
-      this.businessService.updateBookingStatus(id, 'Declined').subscribe({
-        next: () => this.loadDashboardData(),
-        error: () => alert("Failed to decline.")
-      });
-    }
+  initDeclineBooking(booking: any) {
+    this.triggerConfirm(
+      'Decline Request?',
+      `Are you sure you want to decline the request from <b>${booking.customerName}</b>? This cannot be undone.`,
+      () => {
+        this.businessService.updateBookingStatus(booking.id, 'Declined').subscribe({
+          next: () => {
+            this.loadDashboardData();
+            this.triggerSuccess("Request Declined.");
+          },
+          error: () => alert("Failed to decline.")
+        });
+      }
+    );
   }
 
   // --- SERVICE MANAGEMENT ---
@@ -249,39 +278,40 @@ export class ManageServicesComponent implements OnInit {
   saveService() {
     this.isLoading = true;
     const formData = new FormData();
-    formData.append('ServiceName', this.newService.serviceName);
+    formData.append('ServiceName', this.newService.serviceName || '');
     formData.append('Description', this.newService.description || '');
-    formData.append('Price', this.newService.price.toString());
-    formData.append('DurationMinutes', this.newService.durationMinutes.toString());
-
+    const price = this.newService.price != null ? this.newService.price : 0;
+    formData.append('Price', price.toString());
+    const duration = this.newService.durationMinutes != null ? this.newService.durationMinutes : 0;
+    formData.append('DurationMinutes', duration.toString());
     if (this.selectedFile) formData.append('image', this.selectedFile);
 
     if (this.isEditMode) {
       this.businessService.updateService(this.newService.id, formData).subscribe({
         next: () => {
-          alert('Service Updated!');
+          this.triggerSuccess('Service Updated!');
           this.loadDashboardData();
           this.switchTab('services');
         },
-        error: () => { this.isLoading = false; alert('Failed to update service.'); }
+        error: () => { this.isLoading = false; alert('Failed.'); }
       });
     } else {
       this.businessService.addService(formData).subscribe({
         next: () => {
-          alert('Service Added!');
+          this.triggerSuccess('Service Added!');
           this.loadDashboardData();
           this.switchTab('services');
         },
-        error: () => { this.isLoading = false; alert('Failed to add service.'); }
+        error: () => { this.isLoading = false; alert('Failed.'); }
       });
     }
   }
 
   deleteService(id: number) {
-    if(confirm('Delete this service permanently?')) {
+    this.triggerConfirm('Delete Service?', 'Are you sure you want to delete this service permanently?', () => {
       this.businessService.deleteService(id).subscribe({
         next: () => this.loadDashboardData() 
       });
-    }
+    });
   }
 }
